@@ -1,0 +1,1182 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>OPERATION: WAKE UP â€” Matrix Treasure Hunt</title>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+<script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
+<script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+<script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html,body,#root{min-height:100%;background:#000;color:#00ff9f}
+body{font-family:'Share Tech Mono','Courier New',monospace;overflow-x:hidden}
+:root{--bg:#000000;--mg:#00ff9f;--mg2:#00e68a;--mg3:#00cc66;--mg4:#004422;--red:#ff003c;--mred:#ff003c;--line:#00ff9f44;--line-soft:#00ff9f1f;--mterm:#0a0f0a}
+
+/* â•â•â• ANIMATIONS â•â•â• */
+@keyframes blink{0%,100%{opacity:1}50%{opacity:0}}
+@keyframes fadeIn{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+@keyframes scanline{0%{top:-5%}100%{top:105%}}
+@keyframes glitch1{0%,100%{clip-path:polygon(0 0,100% 0,100% 5%,0 5%)}25%{clip-path:polygon(0 15%,100% 15%,100% 30%,0 30%)}50%{clip-path:polygon(0 50%,100% 50%,100% 60%,0 60%)}75%{clip-path:polygon(0 70%,100% 70%,100% 90%,0 90%)}}
+@keyframes glitch2{0%,100%{transform:translate(-2px,1px)}33%{transform:translate(2px,-1px)}66%{transform:translate(-1px,2px)}}
+@keyframes glitch-full{0%,100%{transform:translate(0)}10%{transform:translate(-2px,1px);filter:hue-rotate(90deg)}20%{transform:translate(2px,-1px)}30%{transform:translate(-1px,2px)}50%{transform:translate(-2px,0)}70%{transform:translate(-1px,-1px)}80%{transform:translate(1px,2px)}}
+@keyframes flicker{0%,100%{opacity:1}92%{opacity:.95}94%{opacity:.6}96%{opacity:.95}98%{opacity:.7}}
+@keyframes pulse{0%,100%{box-shadow:0 0 20px #00ff9f33}50%{box-shadow:0 0 40px #00ff9f66}}
+@keyframes pulse-glow{0%,100%{box-shadow:0 0 8px #ff003c44}50%{box-shadow:0 0 26px #ff003c88}}
+@keyframes pulse-green{0%,100%{box-shadow:0 0 5px var(--mg4)}50%{box-shadow:0 0 20px var(--mg2),0 0 40px var(--mg4)}}
+@keyframes red-shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-3px)}75%{transform:translateX(3px)}}
+@keyframes red-shake-hard{0%,100%{transform:translateX(0)}20%{transform:translateX(-8px)}40%{transform:translateX(7px)}60%{transform:translateX(-6px)}80%{transform:translateX(6px)}}
+@keyframes logo-flicker{0%,100%{opacity:1}20%{opacity:.4}40%{opacity:.9}60%{opacity:.5}80%{opacity:.95}}
+@keyframes split-left{0%{transform:translateX(0)}100%{transform:translateX(-60vw)}}
+@keyframes split-right{0%{transform:translateX(0)}100%{transform:translateX(60vw)}}
+@keyframes crt-noise{0%,100%{opacity:.1}50%{opacity:.2}}
+@keyframes typewriter{from{width:0}to{width:100%}}
+@keyframes pill-appear{0%{opacity:0;transform:scale(0.85)}100%{opacity:1;transform:scale(1)}}
+@keyframes intense-flicker{0%,100%{opacity:.28}10%{opacity:.45}20%{opacity:.22}30%{opacity:.48}50%{opacity:.18}70%{opacity:.42}90%{opacity:.25}}
+@keyframes error-flash{0%{opacity:0}15%{opacity:.3}100%{opacity:0}}
+@keyframes red-glitch-text{0%,100%{transform:translate(0,0)}25%{transform:translate(-1px,1px)}50%{transform:translate(1px,-1px)}75%{transform:translate(-1px,0)}}
+
+/* â•â•â• GLOBAL CLASSES â•â•â• */
+.blink{animation:blink 1s step-end infinite}
+.glitch{position:relative}
+.glitch::before,.glitch::after{content:attr(data-text);position:absolute;top:0;left:0;width:100%;background:#000}
+.glitch::before{color:#ff0066;animation:glitch1 3s infinite linear,glitch2 2s infinite;opacity:.4}
+.glitch::after{color:#00ccff;animation:glitch1 3s infinite linear reverse,glitch2 1.5s infinite reverse;opacity:.3}
+.glow{text-shadow:0 0 8px var(--mg),0 0 20px #00e68a88}
+.glitch-anim{animation:glitch-full 0.5s infinite}
+.panel-flicker{animation:flicker 8s infinite}
+.active-panel{animation:pulse 3s ease-in-out infinite}
+
+.scanline-overlay{position:fixed;inset:0;pointer-events:none;z-index:8;overflow:hidden}
+.scanline-overlay::after{content:"";position:absolute;left:0;right:0;height:3px;background:rgba(0,255,159,.06);animation:scanline 4s linear infinite}
+.noise{position:fixed;inset:0;pointer-events:none;z-index:7;background:repeating-linear-gradient(0deg,rgba(255,255,255,.02),rgba(255,255,255,.02) 1px,transparent 1px,transparent 2px);mix-blend-mode:screen;animation:crt-noise .2s steps(2) infinite}
+
+/* â•â•â• TERMINAL / INPUT / BTN â•â•â• */
+.terminal-shell{border:1px solid var(--line);background:rgba(0,24,12,.78);box-shadow:0 0 25px #00ff9f14,inset 0 0 30px #00ff9f0b}
+input::placeholder{color:#00ff9f33}
+input:focus,textarea:focus{outline:none!important;border-color:#00ff9f!important;box-shadow:0 0 12px #00ff9f22}
+button:not(:disabled):hover{background:rgba(0,255,159,.12)!important;box-shadow:0 0 16px rgba(0,255,159,.25)}
+button{transition:all .25s ease}
+button:disabled{opacity:.4;cursor:not-allowed}
+textarea{background:rgba(0,255,159,.05);border:1px solid #00ff9f44;color:#00ff9f;font-family:'Share Tech Mono';font-size:13px;padding:8px 12px;resize:vertical;border-radius:2px;width:100%}
+::-webkit-scrollbar{width:4px}
+::-webkit-scrollbar-track{background:#000}
+::-webkit-scrollbar-thumb{background:#00ff9f44;border-radius:2px}
+.status-expired{color:var(--red);text-shadow:0 0 12px var(--red);animation:glitch2 .35s infinite}
+.error-shake{animation:red-shake-hard .45s cubic-bezier(.36,.07,.19,.97) 3}
+.error-glitch{animation:red-glitch-text .14s linear infinite;color:#ff003c;text-shadow:0 0 5px #ff003c,0 0 15px #ff003c,0 0 30px #ff003c}
+.error-flash{position:fixed;inset:0;background:radial-gradient(circle at center,rgba(255,0,60,.35) 0%,rgba(255,0,60,.1) 35%,transparent 70%);pointer-events:none;z-index:60;animation:error-flash .45s ease-out}
+
+/* â•â•â• LANDING PAGE â•â•â• */
+.landing-wrap{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px;text-align:center}
+.matrix-title{font-family:'Orbitron',monospace;font-size:clamp(32px,7vw,72px);font-weight:900;letter-spacing:4px;line-height:1.1;text-shadow:0 0 20px #00ff9f,0 0 40px #00e68a88}
+.matrix-sub{font-size:clamp(12px,2.5vw,18px);letter-spacing:6px;color:var(--mg3);margin:16px 0 40px}
+.red-pill-btn{font-family:'Orbitron',monospace;font-size:16px;font-weight:700;padding:16px 40px;background:rgba(255,0,60,.08);border:2px solid var(--red);color:var(--red);letter-spacing:3px;cursor:pointer;animation:pulse-glow 2s infinite;transition:all .25s ease}
+.red-pill-btn:hover{background:rgba(255,0,60,.2)!important;box-shadow:0 0 30px rgba(255,0,60,.4),0 0 60px rgba(255,0,60,.2)}
+
+/* â•â•â• SPONSOR ANIMATION â•â•â• */
+.sponsor-stage{position:fixed;inset:0;z-index:50;display:flex;align-items:center;justify-content:center;background:#000}
+.logo-split-wrap{position:relative;width:min(720px,80vw);height:min(420px,45vw);overflow:hidden}
+.logo-half{position:absolute;top:0;width:50%;height:100%;overflow:hidden}
+.logo-half.left{left:0}
+.logo-half.right{right:0}
+.logo-glitch{animation:logo-flicker .35s linear 4}
+.logo-split-left{animation:split-left 1.2s ease-in-out forwards}
+.logo-split-right{animation:split-right 1.2s ease-in-out forwards}
+.matrix-intense canvas{animation:intense-flicker 0.3s infinite!important}
+
+/* â•â•â• QR STYLES â•â•â• */
+.qr-shell{position:relative;background:#000;border:1px solid var(--line);padding:10px;display:inline-flex;border-radius:4px;box-shadow:0 0 16px #00ff9f33}
+.qr-canvas{line-height:0}
+.qr-canvas img,.qr-canvas canvas{display:block}
+.qr-logo-wrap{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);padding:4px;background:#fff;border-radius:8px;box-shadow:0 0 10px rgba(255,255,255,.35)}
+.qr-logo{display:block;object-fit:contain}
+
+@media(max-width:640px){.red-pill-btn{padding:14px 24px;font-size:14px}}
+</style>
+</head>
+<body>
+<div id="root"></div>
+
+<script type="text/babel">
+const { useState, useEffect, useRef, useCallback } = React;
+
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+// MOCK DATABASE
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+let DB = {
+  users: [
+    {id:"admin1",team_name:"OPERATOR",password:"zion2077",role:"admin",slot:null},
+    {id:"t1",team_name:"TEAM ALPHA",password:"neo1999",role:"team",slot:1},
+    {id:"t2",team_name:"TEAM BETA",password:"trinity2",role:"team",slot:2},
+    {id:"t3",team_name:"TEAM GAMMA",password:"morpheus3",role:"team",slot:3},
+  ],
+  clues: [
+    {id:"c1-1",team_id:"t1",clue_number:1,clue_text:"The Matrix is everywhere.\nFind the place where students gather for food.\nBehind the green mark lies the fragment.",validation_code:"ALPHA-1",qr_value:"ALPHA-QR-1",next_clue:2},
+    {id:"c1-2",team_id:"t1",clue_number:2,clue_text:"Follow the white rabbit.\nWhere knowledge is stored in silence,\nSearch the shelf marked with seven digits.",validation_code:"ALPHA-2",qr_value:"ALPHA-QR-2",next_clue:3},
+    {id:"c1-3",team_id:"t1",clue_number:3,clue_text:"There is no spoon.\nThe place where bodies move and sweat,\nNear the locker of the fallen agent.",validation_code:"ALPHA-3",qr_value:"ALPHA-QR-3",next_clue:4},
+    {id:"c1-4",team_id:"t1",clue_number:4,clue_text:"Free your mind.\nWhere fire safety meets a red door,\nThe code is painted on the pipe.",validation_code:"ALPHA-4",qr_value:"ALPHA-QR-4",next_clue:5},
+    {id:"c1-5",team_id:"t1",clue_number:5,clue_text:"Welcome to the real world.\nAtop the highest accessible floor,\nThe signal node awaits beneath the clock.",validation_code:"ALPHA-5",qr_value:"ALPHA-QR-5",next_clue:null},
+    {id:"c2-1",team_id:"t2",clue_number:1,clue_text:"You are the One.\nSeek the place where debates begin,\nUnder the podium of many voices.",validation_code:"BETA-1",qr_value:"BETA-QR-1",next_clue:2},
+    {id:"c2-2",team_id:"t2",clue_number:2,clue_text:"The Oracle speaks.\nWhere art meets science on a corridor wall,\nFind the mural that hides the fragment.",validation_code:"BETA-2",qr_value:"BETA-QR-2",next_clue:3},
+    {id:"c2-3",team_id:"t2",clue_number:3,clue_text:"Dodge the bullet.\nIn the hall of experiments long past,\nLook for the lab that time forgot.",validation_code:"BETA-3",qr_value:"BETA-QR-3",next_clue:4},
+    {id:"c2-4",team_id:"t2",clue_number:4,clue_text:"I know kung fu.\nThe garden between the twin towers,\nHides its secret beneath the iron bench.",validation_code:"BETA-4",qr_value:"BETA-QR-4",next_clue:5},
+    {id:"c2-5",team_id:"t2",clue_number:5,clue_text:"Everything that has a beginning has an end.\nWhere machines hum and servers breathe,\nThe datacentre node pulses with the answer.",validation_code:"BETA-5",qr_value:"BETA-QR-5",next_clue:null},
+    {id:"c3-1",team_id:"t3",clue_number:1,clue_text:"Unplug yourself.\nThe root of all learning begins here,\nAt the main gate post, eastward facing.",validation_code:"GAMMA-1",qr_value:"GAMMA-QR-1",next_clue:2},
+    {id:"c3-2",team_id:"t3",clue_number:2,clue_text:"Coffee fuels the resistance,\nFind the cup that never empties.",validation_code:"GAMMA-2",qr_value:"GAMMA-QR-2",next_clue:3},
+    {id:"c3-3",team_id:"t3",clue_number:3,clue_text:"The machines have won, for now.\nWhere students wait for results in dread,\nThe notice board knows more than it shows.",validation_code:"GAMMA-3",qr_value:"GAMMA-QR-3",next_clue:4},
+    {id:"c3-4",team_id:"t3",clue_number:4,clue_text:"Sentinels are searching.\nThe amphitheatre of open sky,\nHas a stone engraved with coordinates.",validation_code:"GAMMA-4",qr_value:"GAMMA-QR-4",next_clue:5},
+    {id:"c3-5",team_id:"t3",clue_number:5,clue_text:"The prophecy is real.\nBeneath the old building's stairwell,\nA red mark on concrete reveals the truth.",validation_code:"GAMMA-5",qr_value:"GAMMA-QR-5",next_clue:null},
+  ],
+  team_progress: [
+    {team_id:"t1",current_clue:1,clues_completed:0,hunt_start_time:null,hunt_finish_time:null,bonus_ciphers:0},
+    {team_id:"t2",current_clue:1,clues_completed:0,hunt_start_time:null,hunt_finish_time:null,bonus_ciphers:0},
+    {team_id:"t3",current_clue:1,clues_completed:0,hunt_start_time:null,hunt_finish_time:null,bonus_ciphers:0},
+  ],
+  escape_queue: [],
+};
+
+const db = {
+  getUser:(tn,pw)=>DB.users.find(u=>u.team_name.toLowerCase()===tn.toLowerCase()&&u.password===pw),
+  getProgress:(id)=>DB.team_progress.find(p=>p.team_id===id),
+  getClue:(tid,num)=>DB.clues.find(c=>c.team_id===tid&&c.clue_number===num),
+  updateProgress:(id,u)=>{const i=DB.team_progress.findIndex(p=>p.team_id===id);if(i>=0)DB.team_progress[i]={...DB.team_progress[i],...u}},
+  getAllUsers:()=>DB.users.filter(u=>u.role==="team"),
+  getQueue:()=>DB.escape_queue,
+  addToQueue:(id)=>{if(!DB.escape_queue.find(q=>q.team_id===id))DB.escape_queue.push({team_id:id,arrival_time:Date.now(),status:"waiting",escape_start_time:null,escape_finish_time:null,hints_used:0,puzzles_solved:[]})},
+  updateQueue:(id,u)=>{const i=DB.escape_queue.findIndex(q=>q.team_id===id);if(i>=0)DB.escape_queue[i]={...DB.escape_queue[i],...u}},
+  getTeamName:(id)=>DB.users.find(u=>u.id===id)?.team_name||id,
+  addTeam:(data)=>{
+    const id="t"+Date.now();
+    DB.users.push({id,team_name:data.team_name.toUpperCase(),password:data.password,role:"team",slot:parseInt(data.slot)||null});
+    DB.team_progress.push({team_id:id,current_clue:1,clues_completed:0,hunt_start_time:null,hunt_finish_time:null,bonus_ciphers:0});
+    // Auto-generate 5 clues
+    for(let i=1;i<=5;i++){
+      DB.clues.push({id:`${id}-${i}`,team_id:id,clue_number:i,clue_text:`Clue ${i} for ${data.team_name.toUpperCase()}. Edit in Admin panel.`,validation_code:`${data.team_name.toUpperCase().replace(/\s/g,'-')}-${i}`,qr_value:`${data.team_name.toUpperCase().replace(/\s/g,'-')}-QR-${i}`,next_clue:i<5?i+1:null});
+    }
+    return id;
+  },
+  resetTeam:(id)=>{
+    db.updateProgress(id,{current_clue:1,clues_completed:0,hunt_start_time:null,hunt_finish_time:null,bonus_ciphers:0});
+    const qi=DB.escape_queue.findIndex(q=>q.team_id===id);if(qi>=0)DB.escape_queue.splice(qi,1);
+  },
+};
+
+function calcScore(p,q){
+  let h=0,e=0;
+  if(p?.hunt_finish_time&&p?.hunt_start_time){const el=(p.hunt_finish_time-p.hunt_start_time)/1000;const rem=Math.max(0,55*60-el);h=400+Math.floor(rem/10)*5+(p.bonus_ciphers||0)*50}
+  if(q?.escape_finish_time&&q?.escape_start_time){const el=(q.escape_finish_time-q.escape_start_time)/1000;const rem=Math.max(0,5*60-el);e=Math.max(0,500+Math.floor(rem/5)*5-(q.hints_used||0)*30)}
+  return{huntScore:h,escapeScore:e,total:h+e};
+}
+
+const API_ENDPOINTS={
+  login:"/api/login",
+  validateCode:"/api/validate-code",
+  getClue:"/api/get-clue",
+  qrData:"/api/qr-data",
+};
+
+async function apiPost(url,payload){
+  const res=await fetch(url,{
+    method:"POST",
+    headers:{
+      "Content-Type":"application/json",
+      "Accept":"application/json",
+    },
+    body:JSON.stringify(payload),
+  });
+  if(!res.ok)throw new Error(`API ${url} failed with ${res.status}`);
+  return res.json();
+}
+
+const api={
+  login:(teamName,password)=>apiPost(API_ENDPOINTS.login,{teamName,password}),
+  validateCode:(teamId,code,currentClue)=>apiPost(API_ENDPOINTS.validateCode,{teamId,code,currentClue}),
+  getClue:(teamId,clueNumber)=>apiPost(API_ENDPOINTS.getClue,{teamId,clueNumber}),
+  getQRData:(teamId,clueNumber)=>apiPost(API_ENDPOINTS.qrData,{teamId,clueNumber}),
+};
+
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+// MATRIX RAIN (enhanced from first-design)
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+function MatrixRain({intense=false}){
+  const ref=useRef(null);
+  useEffect(()=>{
+    const c=ref.current;if(!c)return;
+    const ctx=c.getContext("2d");
+    const resize=()=>{c.width=window.innerWidth;c.height=window.innerHeight};
+    resize();
+    const chars="ã‚¢ã‚¤ã‚¦ã‚¨ã‚ªã‚«ã‚­ã‚¯ã‚±ã‚³ã‚µã‚·ã‚¹ã‚»ã‚½ã‚¿ãƒãƒ„ãƒ†ãƒˆãƒŠãƒ‹ãƒŒãƒãƒŽ0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ@#$%&";
+    const fs=14,cols=Math.floor(c.width/fs);
+    const drops=Array(cols).fill(1);
+    let af;
+    const draw=()=>{
+      ctx.fillStyle=intense?"rgba(0,0,0,0.022)":"rgba(0,0,0,0.034)";
+      ctx.fillRect(0,0,c.width,c.height);
+      ctx.font=fs+"px 'Share Tech Mono',monospace";
+      for(let i=0;i<drops.length;i++){
+        const ch=chars[Math.floor(Math.random()*chars.length)];
+        ctx.fillStyle=Math.random()>.97?"#ffffff":"#00ff9f";
+        ctx.globalAlpha=Math.random()*.5+.2;
+        ctx.fillText(ch,i*fs,drops[i]*fs);
+        ctx.globalAlpha=1;
+        if(drops[i]*fs>c.height&&Math.random()>.987)drops[i]=0;
+        drops[i]+=intense?.42:.3;
+      }
+      af=requestAnimationFrame(draw);
+    };
+    draw();
+    window.addEventListener("resize",resize);
+    return()=>{cancelAnimationFrame(af);window.removeEventListener("resize",resize)};
+  },[intense]);
+  return <canvas ref={ref} style={{position:"fixed",top:0,left:0,zIndex:0,opacity:intense?.25:.15,pointerEvents:"none",transition:"opacity 0.5s"}}/>;
+}
+
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+// QR CODE GENERATOR (with logo overlay)
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+function QRDisplay({value, logoSrc, size=160}){
+  const qrRef=useRef(null);
+  const [ready,setReady]=useState(false);
+  useEffect(()=>{
+    if(!qrRef.current||!value||typeof QRCode==="undefined"){setReady(false);return;}
+    setReady(false);
+    qrRef.current.innerHTML="";
+    new QRCode(qrRef.current,{
+      text:value,
+      width:size,
+      height:size,
+      colorDark:"#00ff9f",
+      colorLight:"#000000",
+      correctLevel:QRCode.CorrectLevel.H
+    });
+    const t=setTimeout(()=>setReady(true),30);
+    return()=>clearTimeout(t);
+  },[value,size]);
+  if(typeof QRCode==="undefined"){
+    return <div style={{width:size,height:size,border:"1px solid #00ff9f33",display:"flex",alignItems:"center",justifyContent:"center",color:"#00ff9f44",fontSize:11}}>QR LIBRARY MISSING</div>;
+  }
+  return(
+    <div className="qr-shell">
+      <div ref={qrRef} className="qr-canvas" style={{width:size,height:size}}/>
+      {!ready&&<div style={{position:"absolute",inset:0,display:"flex",alignItems:"center",justifyContent:"center",color:"#00ff9f44",fontSize:11,background:"rgba(0,0,0,.28)"}}>GENERATING...</div>}
+      {logoSrc&&ready&&(
+        <div className="qr-logo-wrap">
+          <img src={logoSrc} alt="Sponsor logo" className="qr-logo" style={{width:Math.round(size*0.22),height:Math.round(size*0.22)}}/>
+        </div>
+      )}
+    </div>
+  );
+}
+
+function generateQRDataUrl(value,size=240,logoSrc="photos/logo.png"){
+  return new Promise((resolve)=>{
+    if(typeof QRCode==="undefined"||!value){resolve(null);return;}
+    const mount=document.createElement("div");
+    mount.style.position="fixed";
+    mount.style.left="-9999px";
+    mount.style.top="-9999px";
+    document.body.appendChild(mount);
+    new QRCode(mount,{
+      text:value,
+      width:size,
+      height:size,
+      colorDark:"#00ff9f",
+      colorLight:"#000000",
+      correctLevel:QRCode.CorrectLevel.H
+    });
+    setTimeout(()=>{
+      const src=mount.querySelector("img")?.src||(mount.querySelector("canvas")?mount.querySelector("canvas").toDataURL("image/png"):null);
+      document.body.removeChild(mount);
+      if(!src||!logoSrc){resolve(src);return;}
+      const qrImg=new Image();
+      qrImg.onload=()=>{
+        const canvas=document.createElement("canvas");
+        canvas.width=size;canvas.height=size;
+        const ctx=canvas.getContext("2d");
+        ctx.drawImage(qrImg,0,0,size,size);
+        const logo=new Image();
+        logo.onload=()=>{
+          const lSize=Math.round(size*0.22);
+          const p=Math.max(4,Math.round(size*0.02));
+          const x=Math.round((size-lSize)/2);
+          const y=Math.round((size-lSize)/2);
+          ctx.fillStyle="#ffffff";
+          ctx.fillRect(x-p,y-p,lSize+p*2,lSize+p*2);
+          ctx.drawImage(logo,x,y,lSize,lSize);
+          resolve(canvas.toDataURL("image/png"));
+        };
+        logo.onerror=()=>resolve(canvas.toDataURL("image/png"));
+        logo.src=logoSrc;
+      };
+      qrImg.onerror=()=>resolve(src);
+      qrImg.src=src;
+    },70);
+  });
+}
+
+function TerminalLoader({lines,onComplete,color="#00ff9f"}){
+  const [shown,setShown]=useState([]);
+  const [active,setActive]=useState(0);
+  useEffect(()=>{
+    if(active>=lines.length){const t=setTimeout(onComplete,500);return()=>clearTimeout(t)}
+    const t=setTimeout(()=>{setShown(p=>[...p,lines[active]]);setActive(a=>a+1)},450+Math.random()*300);
+    return()=>clearTimeout(t);
+  },[active,lines.length]);
+  return(
+    <div style={{fontFamily:"'Share Tech Mono',monospace",color,fontSize:13,lineHeight:2}}>
+      {shown.map((l,i)=>(
+        <div key={i} style={{opacity:i<shown.length-1?.65:1,transition:"opacity .3s"}}>
+          <span style={{color:"#00ccff"}}>&gt;</span> {l}
+          {i===shown.length-1&&<span className="blink"> _</span>}
+        </div>
+      ))}
+    </div>
+  );
+}
+
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+// TIMER (55min hunt / 5min escape)
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+function Timer({startTime,duration,onExpire,label="SYSTEM REBOOT IN"}){
+  const [rem,setRem]=useState(duration);
+  const firedRef=useRef(false);
+  useEffect(()=>{
+    const tick=()=>{
+      const el=startTime?(Date.now()-startTime)/1000:0;
+      const r=Math.max(0,duration-el);
+      setRem(r);
+      if(r<=0&&onExpire&&!firedRef.current){firedRef.current=true;onExpire();}
+    };
+    tick();
+    const iv=setInterval(tick,1000);
+    return()=>clearInterval(iv);
+  },[startTime,duration]);
+  const m=String(Math.floor(rem/60)).padStart(2,"0"),s=String(Math.floor(rem%60)).padStart(2,"0");
+  const urgent=rem<120,pct=(rem/duration)*100;
+  return(
+    <div style={{textAlign:"center",marginBottom:20}}>
+      <div style={{fontSize:10,color:"#00ccff",letterSpacing:4,fontFamily:"Orbitron",marginBottom:4}}>{label}</div>
+      <div style={{fontSize:40,fontFamily:"Orbitron",color:urgent?"#ff4444":"#00ff9f",textShadow:`0 0 24px ${urgent?"#ff4444":"#00ff9f"}`,letterSpacing:8,transition:"color .5s"}}>{m}:{s}</div>
+      <div style={{width:"100%",height:3,background:"#111",marginTop:8,borderRadius:2,overflow:"hidden"}}>
+        <div style={{height:"100%",width:pct+"%",background:urgent?"#ff4444":"#00ff9f",transition:"width 1s linear,background .5s"}}/>
+      </div>
+    </div>
+  );
+}
+
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+// SHARED STYLES
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+const S={
+  panel:{border:"1px solid rgba(0,255,159,.35)",background:"rgba(0,255,159,.04)",padding:"18px",marginBottom:16,borderRadius:2,boxShadow:"0 0 20px rgba(0,255,159,.08)"},
+  hdr:{fontFamily:"Orbitron",fontSize:10,color:"#00ccff",letterSpacing:3,marginBottom:14,borderBottom:"1px solid #00ff9f1a",paddingBottom:8},
+  input:{background:"rgba(0,255,159,.06)",border:"1px solid #00ff9f44",color:"#00ff9f",fontFamily:"'Share Tech Mono',monospace",fontSize:13,padding:"10px 12px",outline:"none",width:"100%",letterSpacing:2,borderRadius:2},
+  btn:{background:"transparent",border:"1px solid #00ff9f77",color:"#00ff9f",fontFamily:"Orbitron",fontSize:11,padding:"9px 16px",cursor:"pointer",letterSpacing:2,borderRadius:2,transition:"all .25s ease"},
+  lbl:{fontFamily:"'Share Tech Mono'",fontSize:10,color:"#00ff9f55",letterSpacing:2,marginBottom:5,display:"block"},
+};
+
+function GlitchText({text,size=24}){
+  return <div className="glitch" data-text={text} style={{fontSize:size,fontFamily:"Orbitron",color:"#00ff9f",fontWeight:700,letterSpacing:3,textShadow:"0 0 20px #00ff9f55"}}>{text}</div>;
+}
+
+function Err({msg}){
+  const [flashId,setFlashId]=useState(0);
+  useEffect(()=>{if(msg)setFlashId(v=>v+1);},[msg]);
+  return msg?<>
+    <div key={flashId} className="error-flash"/>
+    <div className="error-shake error-glitch" style={{fontFamily:"'Share Tech Mono'",fontSize:12,marginTop:8,padding:"8px 10px",border:"1px solid #ff444444",background:"#ff003c12"}}>&#62; {msg}</div>
+  </>:null;
+}
+
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+// LANDING PAGE (from first-design aesthetics)
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+function Landing({onRedPill}){
+  const [glitching,setGlitching]=useState(false);
+
+  const handlePill=()=>{
+    setGlitching(true);
+    setTimeout(()=>onRedPill(),1200);
+  };
+
+  return(
+    <div className={`landing-wrap${glitching?" matrix-intense":""}`}>
+      <div style={{animation:"pill-appear .8s ease"}}>
+        <div style={{color:"#00cc66",fontSize:11,letterSpacing:6,marginBottom:32,fontFamily:"Orbitron"}}>
+          <span className="blink">â– </span> OPERATION: WAKE UP
+        </div>
+        <div className={`matrix-title glow${glitching?" glitch-anim":""}`}>
+          WAKE UP,<br/>NEO.
+        </div>
+        <div style={{height:2,width:200,background:"linear-gradient(90deg,transparent,#00e68a,transparent)",margin:"28px auto"}}/>
+        <div className="matrix-sub">THE MATRIX HAS YOU.</div>
+        <div style={{fontSize:11,color:"#004422",letterSpacing:3,marginBottom:52,fontFamily:"'Share Tech Mono'"}}>FOLLOW THE WHITE RABBIT</div>
+        <button className={`red-pill-btn${glitching?" glitch-anim":""}`} onClick={handlePill}>
+          [ TAKE THE RED PILL ]
+        </button>
+        <div style={{marginTop:52,fontSize:10,color:"#004422",letterSpacing:2,fontFamily:"'Share Tech Mono'"}}>A MATRIX TREASURE HUNT &amp; ESCAPE ROOM EXPERIENCE</div>
+      </div>
+    </div>
+  );
+}
+
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+// SPONSOR ANIMATION
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+function SponsorAnimation({onComplete}){
+  const [phase,setPhase]=useState("fade-in"); // fade-in | glitch | split | done
+  const [opacity,setOpacity]=useState(0);
+
+  useEffect(()=>{
+    // Phase 1: fade in
+    const t1=setTimeout(()=>setOpacity(1),100);
+    // Phase 2: glitch
+    const t2=setTimeout(()=>setPhase("glitch"),800);
+    // Phase 3: split
+    const t3=setTimeout(()=>setPhase("split"),1400);
+    // Phase 4: done
+    const t4=setTimeout(()=>onComplete(),2900);
+    return()=>{clearTimeout(t1);clearTimeout(t2);clearTimeout(t3);clearTimeout(t4)};
+  },[]);
+
+  const imgStyle={
+    width:"100%",height:"100%",objectFit:"contain",
+    filter:"drop-shadow(0 0 12px #00ff9f)"
+  };
+
+  return(
+    <div className="sponsor-stage">
+      {/* Matrix rain behind */}
+      <MatrixRain intense={true}/>
+      <div style={{position:"relative",zIndex:2,textAlign:"center"}}>
+        <div style={{fontSize:10,color:"#00cc66",letterSpacing:6,marginBottom:24,fontFamily:"Orbitron",opacity:opacity,transition:"opacity 0.6s"}}>
+          SYSTEM SPONSOR // VERIFIED NODE
+        </div>
+        <div className="logo-split-wrap" style={{opacity,transition:"opacity 0.6s"}}>
+          {phase==="split"?(
+            <>
+              <div className="logo-half left logo-split-left" style={{width:"50%"}}>
+                <img src="photos/matrix.png" style={{...imgStyle,transform:"scale(2) translateX(25%)"}} className="logo-glitch"/>
+              </div>
+              <div className="logo-half right logo-split-right" style={{width:"50%"}}>
+                <img src="photos/matrix.png" style={{...imgStyle,transform:"scale(2) translateX(-25%)"}} className="logo-glitch"/>
+              </div>
+            </>
+          ):(
+            <img
+              src="photos/matrix.png"
+              style={{...imgStyle,width:"100%",height:"100%",position:"absolute",top:0,left:0}}
+              className={phase==="glitch"?"logo-glitch":""}
+            />
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+// LOGIN PAGE
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+function Login({onLogin}){
+  const [tn,setTn]=useState("");
+  const [pass,setPass]=useState("");
+  const [err,setErr]=useState("");
+  const [loading,setLoading]=useState(false);
+  const [booted,setBooted]=useState(false);
+  const BOOT=["INITIALIZING NEURAL INTERFACE...","BYPASSING AGENT SURVEILLANCE...","CONNECTING TO THE MATRIX...","SYSTEM READY â€” AUTHENTICATE."];
+
+  const go=async()=>{
+    setErr("");setLoading(true);
+    await new Promise(r=>setTimeout(r,450));
+    try{
+      const data=await api.login(tn,pass);
+      if(data?.user){onLogin(data.user);return;}
+    }catch(_){ }
+    const u=db.getUser(tn,pass);
+    if(u)onLogin(u);
+    else{setErr("ACCESS DENIED — INVALID CREDENTIALS");setLoading(false);}
+  };
+
+  return(
+    <div style={{minHeight:"100vh",display:"flex",alignItems:"center",justifyContent:"center",padding:20}}>
+      {!booted?(
+        <div style={{maxWidth:460,width:"100%"}}>
+          <TerminalLoader lines={BOOT} onComplete={()=>setBooted(true)}/>
+        </div>
+      ):(
+        <div style={{maxWidth:460,width:"100%",animation:"fadeIn .5s ease"}}>
+          <div style={{textAlign:"center",marginBottom:36}}>
+            <div style={{fontSize:10,color:"#00ccff",letterSpacing:7,fontFamily:"Orbitron",marginBottom:10}}>OPERATION</div>
+            <GlitchText text="WAKE UP" size={52}/>
+            <div style={{fontSize:11,color:"#00ff9f55",fontFamily:"'Share Tech Mono'",marginTop:10,letterSpacing:5}}>MATRIX TREASURE HUNT &amp; ESCAPE ROOM</div>
+          </div>
+          <div style={S.panel} className="panel-flicker terminal-shell">
+            <div style={S.hdr}>[ AUTHENTICATION REQUIRED ]</div>
+            <div style={{marginBottom:14}}>
+              <span style={S.lbl}>TEAM DESIGNATION</span>
+              <input style={S.input} value={tn} onChange={e=>setTn(e.target.value)} placeholder="ENTER TEAM NAME" onKeyDown={e=>e.key==="Enter"&&go()}/>
+            </div>
+            <div style={{marginBottom:20}}>
+              <span style={S.lbl}>SECRET ACCESS CODE</span>
+              <input style={S.input} type="password" value={pass} onChange={e=>setPass(e.target.value)} placeholder="ENTER SECRET CODE" onKeyDown={e=>e.key==="Enter"&&go()}/>
+            </div>
+            <Err msg={err}/>
+            <button style={{...S.btn,width:"100%",fontSize:13,padding:"14px 0",marginTop:err?10:0,fontFamily:"Orbitron",fontWeight:700}} onClick={go} disabled={loading}>
+              {loading?"AUTHENTICATING...":"[ ENTER THE MATRIX ]"}
+            </button>
+            <div style={{marginTop:16,fontSize:10,color:"#00ff9f22",fontFamily:"'Share Tech Mono'",textAlign:"center",lineHeight:1.8}}>
+              DEMO: TEAM ALPHA/neo1999 Â· TEAM BETA/trinity2 Â· OPERATOR/zion2077
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+// QR SCANNER
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+function QRScanner({onScan,onClose}){
+  const vRef=useRef();
+  const [camErr,setCamErr]=useState(null);
+  const [manual,setManual]=useState("");
+  useEffect(()=>{
+    let stream;
+    navigator.mediaDevices?.getUserMedia({video:{facingMode:"environment"}}).then(s=>{stream=s;if(vRef.current)vRef.current.srcObject=s}).catch(()=>setCamErr("Camera unavailable â€” use manual entry below."));
+    return()=>stream?.getTracks().forEach(t=>t.stop());
+  },[]);
+  return(
+    <div style={S.panel} className="terminal-shell">
+      <div style={S.hdr}>[ QR SCANNER â€” FRAGMENT DETECTOR ]</div>
+      <div style={{position:"relative",maxWidth:300,margin:"0 auto"}}>
+        {camErr
+          ?<div style={{color:"#ff6644",fontFamily:"'Share Tech Mono'",fontSize:12,padding:"20px 0",textAlign:"center"}}>{camErr}</div>
+          :<div style={{position:"relative"}}>
+            <video ref={vRef} autoPlay playsInline style={{width:"100%",borderRadius:3,border:"1px solid #00ff9f33"}}/>
+            <div style={{position:"absolute",inset:0,border:"2px solid #00ff9f",borderRadius:3,pointerEvents:"none"}}>
+              <div style={{position:"absolute",top:8,left:8,width:18,height:18,borderTop:"2px solid #00ff9f",borderLeft:"2px solid #00ff9f"}}/>
+              <div style={{position:"absolute",top:8,right:8,width:18,height:18,borderTop:"2px solid #00ff9f",borderRight:"2px solid #00ff9f"}}/>
+              <div style={{position:"absolute",bottom:8,left:8,width:18,height:18,borderBottom:"2px solid #00ff9f",borderLeft:"2px solid #00ff9f"}}/>
+              <div style={{position:"absolute",bottom:8,right:8,width:18,height:18,borderBottom:"2px solid #00ff9f",borderRight:"2px solid #00ff9f"}}/>
+              <div style={{position:"absolute",top:"50%",left:0,right:0,height:1,background:"linear-gradient(90deg,transparent,#00ff9f,transparent)",animation:"scanline 2s linear infinite"}}/>
+            </div>
+          </div>
+        }
+      </div>
+      <div style={{marginTop:16}}>
+        <span style={S.lbl}>MANUAL QR CODE ENTRY:</span>
+        <div style={{display:"flex",gap:8}}>
+          <input style={S.input} value={manual} onChange={e=>setManual(e.target.value.toUpperCase())} placeholder="QR VALUE" onKeyDown={e=>e.key==="Enter"&&manual&&onScan(manual)}/>
+          <button style={{...S.btn,flexShrink:0}} onClick={()=>manual&&onScan(manual)}>SUBMIT</button>
+        </div>
+      </div>
+      <button style={{...S.btn,width:"100%",marginTop:12,borderColor:"#ff4444",color:"#ff4444"}} onClick={onClose}>&#62;&#62; ABORT</button>
+    </div>
+  );
+}
+
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+// CLUE SCREEN (Team view)
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+function ClueScreen({user,onLogout}){
+  const [phase,setPhase]=useState("boot");
+  const [bootLines,setBootLines]=useState([]);
+  const [clue,setClue]=useState(null);
+  const [code,setCode]=useState("");
+  const [codeErr,setCodeErr]=useState("");
+  const [showQR,setShowQR]=useState(false);
+  const [successLines,setSuccessLines]=useState([]);
+  const [queueEntry,setQueueEntry]=useState(null);
+  const [huntExpired,setHuntExpired]=useState(false);
+
+  const progress=()=>db.getProgress(user.id);
+
+  const loadClue=async(num)=>{
+    let c=null;
+    try{
+      const data=await api.getClue(user.id,num);
+      c=data?.clue||null;
+    }catch(_){}
+    if(!c)c=db.getClue(user.id,num);
+    setClue(c);setCode("");setCodeErr("");
+    setBootLines(["CONNECTING TO SOURCE NODE...","DECRYPTING LOCATION DATA...","SIGNAL DETECTED...",`LOADING CLUE ${num} OF 5...`]);
+    setPhase("boot");
+  };
+
+  useEffect(()=>{
+    const p=progress();
+    if(!p.hunt_start_time)db.updateProgress(user.id,{hunt_start_time:Date.now()});
+    loadClue(progress().current_clue);
+  },[]);
+
+  useEffect(()=>{
+    const iv=setInterval(()=>{
+      const q=db.getQueue().find(q=>q.team_id===user.id);
+      if(q){setQueueEntry({...q});if(q.status==="active"&&phase==="escape-queue")setPhase("escape");if(q.status==="finished"&&phase!=="victory")setPhase("victory");}
+    },2000);
+    return()=>clearInterval(iv);
+  },[phase]);
+
+  const verify=async(val)=>{
+    if(!clue)return;
+    if(huntExpired){setCodeErr("TIME EXPIRED â€” ACCESS TERMINATED");return;}
+    const v=val.trim().toUpperCase();
+    let valid=false;
+    try{
+      const data=await api.validateCode(user.id,v,clue.clue_number);
+      valid=!!data?.valid;
+    }catch(_){}
+    if(!valid)valid=v===clue.validation_code.toUpperCase()||v===clue.qr_value.toUpperCase();
+    if(valid){
+      const isLast=clue.next_clue===null;
+      const p=progress();
+      const updates={clues_completed:p.clues_completed+1};
+      if(!isLast)updates.current_clue=clue.next_clue;
+      else updates.hunt_finish_time=Date.now();
+      db.updateProgress(user.id,updates);
+      if(isLast)db.addToQueue(user.id);
+      setSuccessLines(isLast
+        ?["CODE VERIFIED","FRAGMENT ACQUIRED","SOURCE SIGNAL FOUND","MORPHEUS LOCATION IDENTIFIED","ESCAPE ROOM ACCESS UNLOCKED"]
+        :["CODE VERIFIED","FRAGMENT ACQUIRED","DATABASE UPDATED","NEXT NODE UNLOCKED"]);
+      setPhase("success");
+    }else{setCodeErr("INVALID CODE â€” FRAGMENT REJECTED");}
+  };
+
+  const p=progress();
+
+  if(showQR)return(
+    <div style={{minHeight:"100vh",display:"flex",alignItems:"center",justifyContent:"center",padding:20}}>
+      <div style={{maxWidth:460,width:"100%"}}>
+        <QRScanner onScan={v=>{setShowQR(false);verify(v)}} onClose={()=>setShowQR(false)}/>
+      </div>
+    </div>
+  );
+
+  const Header=()=>(
+    <div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-start",marginBottom:20,paddingBottom:12,borderBottom:"1px solid #00ff9f1a"}}>
+      <div>
+        <div style={{fontFamily:"Orbitron",fontSize:9,color:"#00ccff",letterSpacing:3}}>OPERATIVE</div>
+        <div style={{fontFamily:"Orbitron",fontSize:15,color:"#00ff9f",textShadow:"0 0 10px #00ff9f55"}}>{user.team_name}</div>
+      </div>
+      <div style={{textAlign:"right"}}>
+        <div style={{fontFamily:"'Share Tech Mono'",fontSize:10,color:"#00ff9f66"}}>FRAGMENTS: {p.clues_completed}/5</div>
+        <button style={{...S.btn,fontSize:9,padding:"3px 8px",marginTop:4}} onClick={onLogout}>LOGOUT</button>
+      </div>
+    </div>
+  );
+
+  if(phase==="expired"||huntExpired&&phase!=="success"&&phase!=="escape-queue"&&phase!=="escape"&&phase!=="victory")return(
+    <div style={{minHeight:"100vh",display:"flex",alignItems:"center",justifyContent:"center",padding:20}}>
+      <div style={{maxWidth:460,width:"100%",textAlign:"center"}}>
+        <div style={{fontFamily:"Orbitron",fontSize:36,color:"#ff4444",textShadow:"0 0 30px #ff4444",marginBottom:12,animation:"glitch-full .5s infinite"}}>SYSTEM LOCKDOWN</div>
+        <div style={{fontFamily:"'Share Tech Mono'",color:"#ff4444",fontSize:14,letterSpacing:2,marginBottom:8}}>TIME EXPIRED â€” ACCESS TERMINATED</div>
+        <div style={{fontFamily:"'Share Tech Mono'",color:"#ff444466",fontSize:12,marginBottom:32}}>SIMULATION TERMINATED</div>
+        <button style={{...S.btn,borderColor:"#ff4444",color:"#ff4444"}} onClick={onLogout}>DISCONNECT</button>
+      </div>
+    </div>
+  );
+
+  if(phase==="victory"){
+    const q=db.getQueue().find(q=>q.team_id===user.id);
+    const sc=calcScore(p,q);
+    return(
+      <div style={{minHeight:"100vh",display:"flex",alignItems:"center",justifyContent:"center",padding:20}}>
+        <div style={{maxWidth:460,width:"100%"}}>
+          <div style={{...S.panel,textAlign:"center"}}>
+            <GlitchText text="MISSION COMPLETE" size={24}/>
+            <div style={{fontFamily:"'Share Tech Mono'",color:"#00ff9f77",fontSize:12,margin:"16px 0 20px",lineHeight:1.8}}>The Matrix has been unplugged.<br/>Well done, {user.team_name}.</div>
+            <ScRow lbl="HUNT SCORE" val={sc.huntScore}/>
+            <ScRow lbl="ESCAPE SCORE" val={sc.escapeScore}/>
+            <div style={{borderTop:"1px solid #00ff9f22",margin:"10px 0"}}/>
+            <ScRow lbl="TOTAL SCORE" val={sc.total} hi/>
+            <button style={{...S.btn,marginTop:20,width:"100%"}} onClick={onLogout}>DISCONNECT</button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  return(
+    <div style={{minHeight:"100vh",padding:"16px"}}>
+      <div style={{maxWidth:460,margin:"0 auto"}}>
+        <Header/>
+        {p.hunt_start_time&&!p.hunt_finish_time&&(
+          <Timer startTime={p.hunt_start_time} duration={55*60} label="HUNT TIMER" onExpire={()=>setHuntExpired(true)}/>
+        )}
+
+        {huntExpired&&phase==="clue"&&(
+          <div style={{...S.panel,textAlign:"center",borderColor:"#ff444444"}}>
+            <div style={{color:"#ff4444",fontFamily:"Orbitron",fontSize:14,letterSpacing:2,animation:"glitch-full .5s infinite"}}>TIME EXPIRED â€” ACCESS TERMINATED</div>
+          </div>
+        )}
+
+        {phase==="boot"&&(
+          <div style={{...S.panel,}} className="terminal-shell">
+            <TerminalLoader lines={bootLines} onComplete={()=>setPhase("clue")}/>
+          </div>
+        )}
+
+        {phase==="clue"&&clue&&(
+          <div style={S.panel} className="active-panel terminal-shell">
+            <div style={S.hdr}>[ NODE {clue.clue_number} OF 5 â€” DECRYPTED ]</div>
+            <div style={{fontFamily:"'Share Tech Mono'",color:"#00ff9f",fontSize:14,lineHeight:1.9,whiteSpace:"pre-line",padding:"12px 14px",border:"1px solid #00ff9f1a",background:"rgba(0,255,159,.025)",marginBottom:20,borderRadius:2}}>
+              {clue.clue_text}
+            </div>
+            <span style={S.lbl}>ENTER FRAGMENT CODE:</span>
+            <input style={{...S.input,marginBottom:0}} value={code} onChange={e=>{setCode(e.target.value.toUpperCase());setCodeErr("")}} placeholder="XXXX-XX" onKeyDown={e=>e.key==="Enter"&&!huntExpired&&verify(code)} disabled={huntExpired}/>
+            <Err msg={codeErr}/>
+            <div style={{display:"flex",gap:8,marginTop:12}}>
+              <button style={{...S.btn,flex:1}} onClick={()=>!huntExpired&&verify(code)} disabled={huntExpired}>VERIFY CODE</button>
+              <button style={{...S.btn,flex:1,borderColor:"#00ccff",color:"#00ccff"}} onClick={()=>!huntExpired&&setShowQR(true)} disabled={huntExpired}>SCAN QR</button>
+            </div>
+          </div>
+        )}
+
+        {phase==="success"&&(
+          <div style={{...S.panel,}} className="terminal-shell">
+            <TerminalLoader lines={successLines} color="#00ff9f" onComplete={()=>{
+              const up=progress();
+              if(up.hunt_finish_time)setPhase("escape-queue");
+              else loadClue(up.current_clue);
+            }}/>
+          </div>
+        )}
+
+        {phase==="escape-queue"&&(
+          <div style={{...S.panel,textAlign:"center",animation:"pulse 2s infinite"}} className="terminal-shell">
+            <div style={{fontFamily:"Orbitron",fontSize:20,color:"#00ff9f",marginBottom:14,textShadow:"0 0 20px #00ff9f"}}>ESCAPE ROOM UNLOCKED</div>
+            <div style={{fontFamily:"'Share Tech Mono'",color:"#00ccff",fontSize:13,lineHeight:2}}>
+              Proceed to the escape room.<br/>
+              Wait for the OPERATOR to call your team.<br/><br/>
+              <span className="blink">â– </span> STATUS: QUEUED â€” STANDBY
+            </div>
+          </div>
+        )}
+
+        {phase==="escape"&&queueEntry&&(
+          <EscapeTeamView user={user} entry={queueEntry} onVictory={()=>setPhase("victory")}/>
+        )}
+      </div>
+    </div>
+  );
+}
+
+function EscapeTeamView({user,entry,onVictory}){
+  const [e,setE]=useState(entry);
+  const [code,setCode]=useState("");
+  const [codeErr,setCodeErr]=useState("");
+  const FINAL="ORAC-LEVL-ZION-NEOS";
+  const PUZZLES=["Puzzle A1 â€” Cipher Lock","Puzzle A2 â€” Wiring Sequence","Puzzle A3 â€” Mirror Code","Puzzle A4 â€” Final Override"];
+  useEffect(()=>{
+    const iv=setInterval(()=>{const q=db.getQueue().find(q=>q.team_id===user.id);if(q)setE({...q});},2000);
+    return()=>clearInterval(iv);
+  },[user.id]);
+  const submit=()=>{
+    if(code.trim().toUpperCase()===FINAL){
+      db.updateQueue(user.id,{status:"finished",escape_finish_time:Date.now()});
+      onVictory();
+    }else setCodeErr("OVERRIDE REJECTED â€” INVALID SEQUENCE");
+  };
+  return(
+    <div>
+      {e.escape_start_time&&<Timer startTime={e.escape_start_time} duration={5*60} label="ESCAPE TIMER" onExpire={()=>{}}/>}
+      <div style={{...S.panel,}} className="terminal-shell">
+        <div style={S.hdr}>[ ESCAPE SEQUENCE â€” PUZZLE TRACKER ]</div>
+        {PUZZLES.map((p,i)=>{const done=(e.puzzles_solved||[]).includes(i);return(
+          <div key={i} style={{display:"flex",alignItems:"center",gap:10,padding:"7px 0",borderBottom:"1px solid #00ff9f0d"}}>
+            <div style={{width:16,height:16,border:`1px solid ${done?"#00ff9f":"#00ff9f33"}`,display:"flex",alignItems:"center",justifyContent:"center",fontSize:11,color:"#00ff9f",flexShrink:0,transition:"all .3s"}}>{done?"âœ“":""}</div>
+            <span style={{fontFamily:"'Share Tech Mono'",fontSize:12,color:done?"#00ff9f":"#00ff9f66",transition:"color .3s"}}>{p}</span>
+          </div>
+        );})}
+      </div>
+      <div style={{...S.panel,}} className="terminal-shell">
+        <div style={S.hdr}>[ FINAL OVERRIDE SEQUENCE ]</div>
+        <span style={S.lbl}>ENTER OVERRIDE CODE:</span>
+        <input style={S.input} value={code} onChange={e=>{setCode(e.target.value.toUpperCase());setCodeErr("")}} placeholder="XXXX-XXXX-XXXX-XXXX" onKeyDown={e=>e.key==="Enter"&&submit()}/>
+        <Err msg={codeErr}/>
+        <button style={{...S.btn,width:"100%",marginTop:12}} onClick={submit}>SUBMIT OVERRIDE</button>
+      </div>
+    </div>
+  );
+}
+
+function ScRow({lbl,val,hi}){
+  return(
+    <div style={{display:"flex",justifyContent:"space-between",padding:"7px 0",borderBottom:"1px solid #00ff9f0d"}}>
+      <span style={{fontFamily:"'Share Tech Mono'",fontSize:12,color:"#00ff9f77"}}>{lbl}</span>
+      <span style={{fontFamily:"Orbitron",fontSize:hi?18:13,color:hi?"#ffcc00":"#00ff9f"}}>{val}</span>
+    </div>
+  );
+}
+
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+// ADMIN PANEL
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+function Admin({user,onLogout}){
+  const [tab,setTab]=useState("monitor");
+  const TABS=[{id:"monitor",lbl:"MONITOR"},{id:"queue",lbl:"ESCAPE QUEUE"},{id:"board",lbl:"LEADERBOARD"},{id:"manage",lbl:"MANAGE"},{id:"qrcodes",lbl:"QR CODES"}];
+  return(
+    <div style={{minHeight:"100vh",padding:"16px"}}>
+      <div style={{maxWidth:900,margin:"0 auto"}}>
+        <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:20,paddingBottom:14,borderBottom:"1px solid #00ff9f1a"}}>
+          <div>
+            <div style={{fontFamily:"Orbitron",fontSize:10,color:"#00ccff",letterSpacing:4,marginBottom:4}}>OPERATOR ACCESS // LEVEL 9</div>
+            <GlitchText text="ADMIN CONTROL PANEL" size={22}/>
+          </div>
+          <button style={{...S.btn,fontSize:10,borderColor:"#ff4444",color:"#ff4444"}} onClick={onLogout}>LOGOUT</button>
+        </div>
+        <div style={{display:"flex",gap:6,marginBottom:20,flexWrap:"wrap"}}>
+          {TABS.map(t=><button key={t.id} style={{...S.btn,...(tab===t.id?{background:"#00ff9f1a",borderColor:"#00ff9f"}:{})}} onClick={()=>setTab(t.id)}>{t.lbl}</button>)}
+        </div>
+        {tab==="monitor"&&<Monitor/>}
+        {tab==="queue"&&<Queue/>}
+        {tab==="board"&&<Board/>}
+        {tab==="manage"&&<Manage/>}
+        {tab==="qrcodes"&&<QRCodes/>}
+      </div>
+    </div>
+  );
+}
+
+function Monitor(){
+  const [,tick]=useState(0);
+  useEffect(()=>{const iv=setInterval(()=>tick(t=>t+1),3000);return()=>clearInterval(iv)},[]);
+  const teams=db.getAllUsers();
+  return(
+    <div style={{...S.panel,}} className="terminal-shell">
+      <div style={S.hdr}>[ TEAM PROGRESS MONITOR â€” LIVE ]</div>
+      <div style={{overflowX:"auto"}}>
+        <table style={{width:"100%",borderCollapse:"collapse",fontFamily:"'Share Tech Mono'",fontSize:12,minWidth:540}}>
+          <thead><tr>{["TEAM","CLUE","COMPLETED","STARTED","FINISHED","BONUS CIPHERS"].map(h=><th key={h} style={{padding:"8px 10px",borderBottom:"1px solid #00ff9f22",color:"#00ccff",textAlign:"left",fontFamily:"Orbitron",fontSize:9,letterSpacing:1}}>{h}</th>)}</tr></thead>
+          <tbody>
+            {teams.map(u=>{
+              const p=db.getProgress(u.id);
+              return(
+                <tr key={u.id} style={{borderBottom:"1px solid #00ff9f0a"}}>
+                  <td style={{padding:"8px 10px",color:"#00ff9f",fontFamily:"Orbitron",fontSize:11}}>{u.team_name}</td>
+                  <td style={{padding:"8px 10px",color:"#ffcc00"}}>{p?.current_clue||"â€”"}</td>
+                  <td style={{padding:"8px 10px"}}>{p?.clues_completed||0}/5</td>
+                  <td style={{padding:"8px 10px",color:"#00ff9f66"}}>{p?.hunt_start_time?new Date(p.hunt_start_time).toLocaleTimeString():"â€”"}</td>
+                  <td style={{padding:"8px 10px",color:"#00ff9f66"}}>{p?.hunt_finish_time?new Date(p.hunt_finish_time).toLocaleTimeString():"â€”"}</td>
+                  <td style={{padding:"8px 10px"}}>
+                    <button style={{...S.btn,fontSize:9,padding:"2px 8px"}} onClick={()=>db.updateProgress(u.id,{bonus_ciphers:(p?.bonus_ciphers||0)+1})}>+CIPHER</button>
+                    <span style={{marginLeft:6,color:"#00ccff"}}>{p?.bonus_ciphers||0}</span>
+                  </td>
+                </tr>
+              );
+            })}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  );
+}
+
+function Queue(){
+  const [queue,setQueue]=useState([...db.getQueue()]);
+  const PUZZLES=["Puzzle A1 â€” Cipher Lock","Puzzle A2 â€” Wiring Sequence","Puzzle A3 â€” Mirror Code","Puzzle A4 â€” Final Override"];
+  const ref=useCallback(()=>{setQueue([...db.getQueue()]);},[]);
+  useEffect(()=>{const iv=setInterval(ref,2000);return()=>clearInterval(iv)},[]);
+
+  const start=(id)=>{db.updateQueue(id,{status:"active",escape_start_time:Date.now()});ref()};
+  const end=(id)=>{db.updateQueue(id,{status:"finished",escape_finish_time:Date.now()});ref()};
+  const toggleP=(id,i)=>{const e=db.getQueue().find(q=>q.team_id===id);if(!e)return;const s=e.puzzles_solved||[];db.updateQueue(id,{puzzles_solved:s.includes(i)?s.filter(x=>x!==i):[...s,i]});ref()};
+  const hint=(id)=>{const e=db.getQueue().find(q=>q.team_id===id);db.updateQueue(id,{hints_used:(e?.hints_used||0)+1});ref()};
+
+  return(
+    <div>
+      <div style={{...S.hdr,marginBottom:16}}>[ ESCAPE ROOM QUEUE CONTROL ]</div>
+      {queue.length===0&&<div style={{...S.panel,fontFamily:"'Share Tech Mono'",color:"#00ff9f33",padding:18,textAlign:"center"}}>NO TEAMS IN QUEUE â€” AWAITING OPERATIVES</div>}
+      {queue.map((entry,i)=>{
+        const nm=db.getTeamName(entry.team_id);
+        const active=entry.status==="active",done=entry.status==="finished";
+        return(
+          <div key={entry.team_id} style={{...S.panel,borderColor:active?"#00ff9f":done?"#00ff9f33":"#00ff9f1a",marginBottom:12}}>
+            <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:active||done?12:0}}>
+              <div>
+                <span style={{fontFamily:"'Share Tech Mono'",color:"#00ccff",marginRight:8}}>#{i+1}</span>
+                <span style={{fontFamily:"Orbitron",color:"#00ff9f",fontSize:14}}>{nm}</span>
+                <span style={{fontFamily:"'Share Tech Mono'",fontSize:10,color:active?"#00ff9f":done?"#00ff9f44":"#ffcc00",marginLeft:10}}>[{active?"ACTIVE":done?"FINISHED":"WAITING"}]</span>
+              </div>
+              <div style={{display:"flex",gap:6}}>
+                {!active&&!done&&<button style={S.btn} onClick={()=>start(entry.team_id)}>â–¶ START</button>}
+                {active&&<button style={{...S.btn,borderColor:"#ff4444",color:"#ff4444"}} onClick={()=>end(entry.team_id)}>â–  END</button>}
+              </div>
+            </div>
+            {(active||done)&&<>
+              {entry.escape_start_time&&<Timer startTime={entry.escape_start_time} duration={5*60} label="ESCAPE TIMER" onExpire={()=>{}}/>}
+              {PUZZLES.map((pp,pi)=>{const solved=(entry.puzzles_solved||[]).includes(pi);return(
+                <div key={pi} style={{display:"flex",alignItems:"center",gap:8,padding:"5px 0"}}>
+                  <button style={{...S.btn,fontSize:10,padding:"2px 7px",borderColor:solved?"#00ff9f":"#00ff9f33"}} onClick={()=>toggleP(entry.team_id,pi)}>{solved?"âœ“":"â—‹"}</button>
+                  <span style={{fontFamily:"'Share Tech Mono'",fontSize:12,color:solved?"#00ff9f":"#00ff9f55"}}>{pp}</span>
+                </div>
+              );})}
+              <div style={{marginTop:8}}>
+                <button style={{...S.btn,fontSize:10}} onClick={()=>hint(entry.team_id)}>USE HINT ({entry.hints_used||0} used Â· -{(entry.hints_used||0)*30}pts)</button>
+              </div>
+            </>}
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
+function Board(){
+  const [,tick]=useState(0);
+  useEffect(()=>{const iv=setInterval(()=>tick(t=>t+1),5000);return()=>clearInterval(iv)},[]);
+  const teams=db.getAllUsers();
+  const rows=teams.map(u=>{
+    const p=db.getProgress(u.id);
+    const q=db.getQueue().find(q=>q.team_id===u.id);
+    const sc=calcScore(p,q);
+    const tt=p?.hunt_finish_time&&p?.hunt_start_time?Math.floor((p.hunt_finish_time-p.hunt_start_time)/1000)+(q?.escape_finish_time&&q?.escape_start_time?Math.floor((q.escape_finish_time-q.escape_start_time)/1000):0):null;
+    return{...u,p,q,sc,tt};
+  }).sort((a,b)=>b.sc.total-a.sc.total);
+  const ft=s=>s!==null?Math.floor(s/60)+"m "+(s%60)+"s":"â€”";
+  return(
+    <div style={{...S.panel,}} className="terminal-shell">
+      <div style={S.hdr}>[ LEADERBOARD â€” OPERATOR EYES ONLY ]</div>
+      <div style={{overflowX:"auto"}}>
+        <table style={{width:"100%",borderCollapse:"collapse",fontFamily:"'Share Tech Mono'",fontSize:12,minWidth:580}}>
+          <thead><tr>{["#","TEAM","CLUES","HUNT","ESCAPE","TOTAL","TIME"].map(h=><th key={h} style={{padding:"8px 10px",borderBottom:"1px solid #00ff9f22",color:"#00ccff",textAlign:"left",fontFamily:"Orbitron",fontSize:9}}>{h}</th>)}</tr></thead>
+          <tbody>
+            {rows.map((r,i)=>(
+              <tr key={r.id} style={{borderBottom:"1px solid #00ff9f0a",background:i===0?"rgba(0,255,159,0.04)":"transparent"}}>
+                <td style={{padding:"8px 10px",color:i===0?"#ffcc00":"#00ff9f55",fontFamily:"Orbitron",fontWeight:i===0?"bold":"normal"}}>#{i+1}</td>
+                <td style={{padding:"8px 10px",color:"#00ff9f",fontFamily:"Orbitron",fontSize:10}}>{r.team_name}</td>
+                <td style={{padding:"8px 10px"}}>{r.p?.clues_completed||0}/5</td>
+                <td style={{padding:"8px 10px",color:"#00ff9f"}}>{r.sc.huntScore}</td>
+                <td style={{padding:"8px 10px",color:"#00ccff"}}>{r.sc.escapeScore}</td>
+                <td style={{padding:"8px 10px",fontFamily:"Orbitron",fontSize:i===0?16:13,color:i===0?"#ffcc00":"#00ff9f"}}>{r.sc.total}</td>
+                <td style={{padding:"8px 10px",color:"#00ff9f44"}}>{ft(r.tt)}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  );
+}
+
+function Manage(){
+  const [teams,setTeams]=useState(db.getAllUsers());
+  const [nt,setNt]=useState({team_name:"",password:"",slot:""});
+  const [editClue,setEditClue]=useState(null);
+  const [ce,setCe]=useState({});
+  const [msg,setMsg]=useState("");
+  const [expandTeam,setExpandTeam]=useState(null);
+  const flash=(m)=>{setMsg(m);setTimeout(()=>setMsg(""),2500)};
+
+  const addTeam=()=>{
+    if(!nt.team_name||!nt.password)return;
+    db.addTeam(nt);
+    setTeams(db.getAllUsers());setNt({team_name:"",password:"",slot:""});flash("TEAM CREATED // CLUES AUTO-GENERATED");
+  };
+
+  return(
+    <div>
+      {msg&&<div style={{color:"#00ff9f",fontFamily:"'Share Tech Mono'",fontSize:12,marginBottom:12,padding:"8px 10px",border:"1px solid #00ff9f33",background:"#00ff9f08",animation:"fadeIn .3s"}}>&gt; {msg}</div>}
+
+      <div style={{...S.panel,}} className="terminal-shell">
+        <div style={S.hdr}>[ CREATE TEAM ]</div>
+        <div style={{display:"grid",gridTemplateColumns:"1fr 1fr 70px",gap:8,marginBottom:8}}>
+          <input style={S.input} placeholder="TEAM NAME" value={nt.team_name} onChange={e=>setNt(p=>({...p,team_name:e.target.value}))}/>
+          <input style={S.input} placeholder="PASSWORD" value={nt.password} onChange={e=>setNt(p=>({...p,password:e.target.value}))}/>
+          <input style={S.input} placeholder="SLOT" value={nt.slot} onChange={e=>setNt(p=>({...p,slot:e.target.value}))}/>
+        </div>
+        <button style={S.btn} onClick={addTeam}>CREATE TEAM</button>
+      </div>
+
+      <div style={{...S.panel,}} className="terminal-shell">
+        <div style={S.hdr}>[ TEAM CONTROLS ]</div>
+        {teams.map(u=>(
+          <div key={u.id} style={{borderBottom:"1px solid #00ff9f0d",padding:"6px 0"}}>
+            <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",padding:"4px 0"}}>
+              <span style={{fontFamily:"'Share Tech Mono'",color:"#00ff9f",fontSize:13,cursor:"pointer"}} onClick={()=>setExpandTeam(expandTeam===u.id?null:u.id)}>
+                {expandTeam===u.id?"â–¼":"â–¶"} {u.team_name}
+              </span>
+              <button style={{...S.btn,fontSize:9,padding:"3px 8px",borderColor:"#ff4444",color:"#ff4444"}} onClick={()=>{db.resetTeam(u.id);flash(`${u.team_name} RESET`)}}>RESET</button>
+            </div>
+            {expandTeam===u.id&&(
+              <div style={{marginTop:8,paddingLeft:16,borderLeft:"1px solid #00ff9f1a"}}>
+                {DB.clues.filter(c=>c.team_id===u.id).map(c=>{
+                  const isEditing=editClue===c.id;
+                  return(
+                    <div key={c.id} style={{padding:"8px 0",borderBottom:"1px solid #00ff9f0d"}}>
+                      <div style={{display:"flex",justifyContent:"space-between",alignItems:"center"}}>
+                        <span style={{fontFamily:"'Share Tech Mono'",fontSize:11,color:"#00ccff"}}>CLUE {c.clue_number} // {c.validation_code}</span>
+                        <button style={{...S.btn,fontSize:9,padding:"2px 8px"}} onClick={()=>{setEditClue(isEditing?null:c.id);setCe({...c})}}>
+                          {isEditing?"CANCEL":"EDIT"}
+                        </button>
+                      </div>
+                      <div style={{fontFamily:"'Share Tech Mono'",fontSize:11,color:"#00ff9f55",marginTop:4,whiteSpace:"pre-line"}}>{c.clue_text.substring(0,60)}...</div>
+                      {isEditing&&(
+                        <div style={{marginTop:8}}>
+                          <textarea rows={4} value={ce.clue_text} onChange={e=>setCe(p=>({...p,clue_text:e.target.value}))}/>
+                          <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:6,marginTop:6}}>
+                            <input style={S.input} value={ce.validation_code} onChange={e=>setCe(p=>({...p,validation_code:e.target.value.toUpperCase()}))} placeholder="VALIDATION CODE"/>
+                            <input style={S.input} value={ce.qr_value} onChange={e=>setCe(p=>({...p,qr_value:e.target.value.toUpperCase()}))} placeholder="QR VALUE"/>
+                          </div>
+                          <button style={{...S.btn,marginTop:6}} onClick={()=>{
+                            const i=DB.clues.findIndex(x=>x.id===c.id);if(i>=0)DB.clues[i]={...DB.clues[i],...ce};
+                            setEditClue(null);flash("CLUE UPDATED");
+                          }}>SAVE CLUE</button>
+                        </div>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+// QR CODE MANAGEMENT (Admin)
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+function QRCodes(){
+  const [selTeam,setSelTeam]=useState("t1");
+  const [qrList,setQrList]=useState([]);
+  const teams=db.getAllUsers();
+
+  useEffect(()=>{
+    const clues=DB.clues.filter(c=>c.team_id===selTeam);
+    setQrList(clues);
+  },[selTeam]);
+
+  const downloadQR=(dataUrl,filename)=>{
+    const a=document.createElement('a');a.href=dataUrl;a.download=filename;a.click();
+  };
+
+  const printQR=(dataUrl,label)=>{
+    const w=window.open('','_blank');
+    w.document.write(`<html><body style="background:#000;display:flex;align-items:center;justify-content:center;min-height:100vh;flex-direction:column;font-family:monospace;color:#00ff9f"><img src="${dataUrl}" style="width:300px;height:300px;image-rendering:pixelated"/><div style="margin-top:16px;font-size:14px;letter-spacing:2px">${label}</div></body></html>`);
+    w.document.close();setTimeout(()=>w.print(),500);
+  };
+
+  return(
+    <div>
+      <div style={{...S.panel,}} className="terminal-shell">
+        <div style={S.hdr}>[ QR CODE GENERATOR â€” SELECT TEAM ]</div>
+        <div style={{display:"flex",gap:8,flexWrap:"wrap",marginBottom:16}}>
+          {teams.map(u=><button key={u.id} style={{...S.btn,...(selTeam===u.id?{background:"#00ff9f1a",borderColor:"#00ff9f"}:{})}} onClick={()=>setSelTeam(u.id)}>{u.team_name}</button>)}
+        </div>
+        <div style={{fontSize:10,color:"#00ff9f44",fontFamily:"'Share Tech Mono'",marginBottom:8}}>
+          QR SPECS: HIGH error correction Â· Black bg Â· Neon green modules Â· Sponsor logo embedded (22% width)
+        </div>
+      </div>
+
+      <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fill,minmax(240px,1fr))",gap:16}}>
+        {qrList.map(c=>(
+          <QRCard key={c.id} clue={c} onDownload={downloadQR} onPrint={printQR}/>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function QRCard({clue,onDownload,onPrint}){
+  const [qrSrc,setQrSrc]=useState(null);
+  const [payload,setPayload]=useState(clue.qr_value);
+  useEffect(()=>{
+    let active=true;
+    (async()=>{
+      let value=clue.qr_value;
+      try{
+        const data=await api.getQRData(clue.team_id,clue.clue_number);
+        if(data?.payload)value=data.payload;
+      }catch(_){}
+      if(!active)return;
+      setPayload(value);
+      const src=await generateQRDataUrl(value,200,"photos/logo.png");
+      if(active)setQrSrc(src);
+    })();
+    return()=>{active=false;};
+  },[clue.qr_value,clue.team_id,clue.clue_number]);
+
+  return(
+    <div style={{...S.panel,textAlign:"center"}} className="terminal-shell">
+      <div style={{fontFamily:"Orbitron",fontSize:10,color:"#00ccff",letterSpacing:2,marginBottom:8}}>CLUE {clue.clue_number}</div>
+      <div style={{fontFamily:"'Share Tech Mono'",fontSize:11,color:"#00ff9f",marginBottom:12,letterSpacing:1}}>{payload}</div>
+      <div style={{display:"flex",justifyContent:"center",marginBottom:12}}>
+        <QRDisplay value={payload} logoSrc="photos/logo.png" size={160}/>
+      </div>
+      <div style={{fontFamily:"'Share Tech Mono'",fontSize:9,color:"#00ff9f33",marginBottom:10,lineHeight:1.5}}>VALIDATION: {clue.validation_code}</div>
+      <div style={{display:"flex",gap:6,justifyContent:"center"}}>
+        <button style={{...S.btn,fontSize:9,padding:"4px 10px"}} onClick={()=>qrSrc&&onDownload(qrSrc,`QR_${payload}.png`)}>â¬‡ DL</button>
+        <button style={{...S.btn,fontSize:9,padding:"4px 10px",borderColor:"#00ccff",color:"#00ccff"}} onClick={()=>qrSrc&&onPrint(qrSrc,payload)}>âŽ™ PRINT</button>
+      </div>
+    </div>
+  );
+}
+
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+// APP ROOT
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+function App(){
+  const [screen,setScreen]=useState("landing"); // landing | sponsor | auth | game
+  const [user,setUser]=useState(null);
+  const [intense,setIntense]=useState(false);
+
+  const handleRedPill=()=>{
+    setIntense(true);
+    setTimeout(()=>setScreen("sponsor"),100);
+  };
+
+  const handleSponsorDone=()=>{
+    setScreen("auth");
+    setIntense(false);
+  };
+
+  const login=(u)=>{setUser(u);setScreen("game")};
+  const logout=()=>{setUser(null);setScreen("auth")};
+
+  return(
+    <>
+      <MatrixRain intense={intense||screen==="sponsor"}/>
+      <div className="scanline-overlay"/>
+      <div className="noise"/>
+
+      {/* LANDING */}
+      {screen==="landing"&&(
+        <div style={{position:"relative",zIndex:1}}>
+          <Landing onRedPill={handleRedPill}/>
+        </div>
+      )}
+
+      {/* SPONSOR ANIMATION */}
+      {screen==="sponsor"&&(
+        <SponsorAnimation onComplete={handleSponsorDone}/>
+      )}
+
+      {/* AUTH / GAME */}
+      {(screen==="auth"||screen==="game")&&(
+        <div style={{position:"relative",zIndex:1,minHeight:"100vh"}}>
+          {screen==="auth"&&<Login onLogin={login}/>}
+          {screen==="game"&&user?.role==="admin"&&<Admin user={user} onLogout={logout}/>}
+          {screen==="game"&&user?.role==="team"&&<ClueScreen user={user} onLogout={logout}/>}
+        </div>
+      )}
+    </>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById("root")).render(<App/>);
+</script>
+</body>
+</html>
+
+
+
+
+
