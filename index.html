@@ -138,24 +138,100 @@ let DB = {
   escape_queue: [],
 };
 
+const toCluePayload=(clue)=>`${String(clue.id||"").toUpperCase()}|${String(clue.validationCode||"").toUpperCase()}`;
+
+const seedCatalog=[];
+const seedTeamClues={};
+DB.clues.forEach((legacy,i)=>{
+  const clueId=`clue_${String(i+1).padStart(3,"0")}`;
+  seedCatalog.push({
+    id:clueId,
+    title:`Node ${legacy.clue_number} - ${legacy.team_id.toUpperCase()}`,
+    description:legacy.clue_text,
+    validationCode:legacy.validation_code,
+    hint:"",
+    difficulty:"",
+  });
+  if(!seedTeamClues[legacy.team_id])seedTeamClues[legacy.team_id]=[];
+  seedTeamClues[legacy.team_id].push(clueId);
+});
+DB.clue_database=seedCatalog;
+DB.team_clues=seedTeamClues;
+
 const db = {
   getUser:(tn,pw)=>DB.users.find(u=>u.team_name.toLowerCase()===tn.toLowerCase()&&u.password===pw),
   getProgress:(id)=>DB.team_progress.find(p=>p.team_id===id),
-  getClue:(tid,num)=>DB.clues.find(c=>c.team_id===tid&&c.clue_number===num),
+  getClueById:(id)=>DB.clue_database.find(c=>c.id===id),
+  getClueDatabase:()=>DB.clue_database,
+  getTeamClueIds:(teamId)=>DB.team_clues[teamId]||[],
+  getAssignedClues:(teamId)=>db.getTeamClueIds(teamId).map(id=>db.getClueById(id)).filter(Boolean),
+  getClue:(teamId,num)=>{
+    const assigned=db.getAssignedClues(teamId);
+    const idx=Math.max(0,(num||1)-1);
+    const clue=assigned[idx];
+    if(!clue)return null;
+    return{
+      ...clue,
+      clue_number:idx+1,
+      clue_text:clue.description,
+      validation_code:clue.validationCode,
+      qr_value:toCluePayload(clue),
+      next_clue:idx+1<assigned.length?idx+2:null,
+    };
+  },
   updateProgress:(id,u)=>{const i=DB.team_progress.findIndex(p=>p.team_id===id);if(i>=0)DB.team_progress[i]={...DB.team_progress[i],...u}},
   getAllUsers:()=>DB.users.filter(u=>u.role==="team"),
   getQueue:()=>DB.escape_queue,
   addToQueue:(id)=>{if(!DB.escape_queue.find(q=>q.team_id===id))DB.escape_queue.push({team_id:id,arrival_time:Date.now(),status:"waiting",escape_start_time:null,escape_finish_time:null,hints_used:0,puzzles_solved:[]})},
   updateQueue:(id,u)=>{const i=DB.escape_queue.findIndex(q=>q.team_id===id);if(i>=0)DB.escape_queue[i]={...DB.escape_queue[i],...u}},
   getTeamName:(id)=>DB.users.find(u=>u.id===id)?.team_name||id,
+  normalizeTeamProgress:(teamId)=>{
+    const p=db.getProgress(teamId);
+    if(!p)return;
+    const max=db.getAssignedClues(teamId).length;
+    const next={
+      current_clue:max===0?1:Math.min(Math.max(1,p.current_clue||1),max),
+      clues_completed:Math.min(Math.max(0,p.clues_completed||0),max),
+    };
+    db.updateProgress(teamId,next);
+  },
+  addClue:(data)=>{
+    const next=DB.clue_database.length+1;
+    const id=`clue_${String(next).padStart(3,"0")}`;
+    const clue={id,title:data.title.trim(),description:data.description.trim(),validationCode:data.validationCode.trim().toUpperCase(),hint:(data.hint||"").trim(),difficulty:(data.difficulty||"").trim()};
+    DB.clue_database.push(clue);
+    return clue;
+  },
+  updateClue:(id,updates)=>{
+    const i=DB.clue_database.findIndex(c=>c.id===id);
+    if(i<0)return null;
+    DB.clue_database[i]={...DB.clue_database[i],...updates,validationCode:(updates.validationCode??DB.clue_database[i].validationCode).trim().toUpperCase()};
+    return DB.clue_database[i];
+  },
+  deleteClue:(id)=>{
+    DB.clue_database=DB.clue_database.filter(c=>c.id!==id);
+    Object.keys(DB.team_clues).forEach(tid=>{
+      DB.team_clues[tid]=(DB.team_clues[tid]||[]).filter(cid=>cid!==id);
+      db.normalizeTeamProgress(tid);
+    });
+  },
+  assignClue:(teamId,clueId)=>{
+    if(!DB.team_clues[teamId])DB.team_clues[teamId]=[];
+    if(DB.team_clues[teamId].includes(clueId))return false;
+    DB.team_clues[teamId].push(clueId);
+    db.normalizeTeamProgress(teamId);
+    return true;
+  },
+  unassignClue:(teamId,clueId)=>{
+    if(!DB.team_clues[teamId])return;
+    DB.team_clues[teamId]=DB.team_clues[teamId].filter(id=>id!==clueId);
+    db.normalizeTeamProgress(teamId);
+  },
   addTeam:(data)=>{
     const id="t"+Date.now();
     DB.users.push({id,team_name:data.team_name.toUpperCase(),password:data.password,role:"team",slot:parseInt(data.slot)||null});
     DB.team_progress.push({team_id:id,current_clue:1,clues_completed:0,hunt_start_time:null,hunt_finish_time:null,bonus_ciphers:0});
-    // Auto-generate 5 clues
-    for(let i=1;i<=5;i++){
-      DB.clues.push({id:`${id}-${i}`,team_id:id,clue_number:i,clue_text:`Clue ${i} for ${data.team_name.toUpperCase()}. Edit in Admin panel.`,validation_code:`${data.team_name.toUpperCase().replace(/\s/g,'-')}-${i}`,qr_value:`${data.team_name.toUpperCase().replace(/\s/g,'-')}-QR-${i}`,next_clue:i<5?i+1:null});
-    }
+    DB.team_clues[id]=[];
     return id;
   },
   resetTeam:(id)=>{
@@ -597,14 +673,18 @@ function ClueScreen({user,onLogout}){
   const progress=()=>db.getProgress(user.id);
 
   const loadClue=async(num)=>{
+    const total=db.getAssignedClues(user.id).length;
     let c=null;
     try{
       const data=await api.getClue(user.id,num);
       c=data?.clue||null;
+      if(c&&c.validationCode&&!c.validation_code){
+        c={...c,clue_number:num,clue_text:c.description||"",validation_code:c.validationCode,qr_value:toCluePayload(c),next_clue:num<total?num+1:null};
+      }
     }catch(_){}
     if(!c)c=db.getClue(user.id,num);
     setClue(c);setCode("");setCodeErr("");
-    setBootLines(["CONNECTING TO SOURCE NODE...","DECRYPTING LOCATION DATA...","SIGNAL DETECTED...",`LOADING CLUE ${num} OF 5...`]);
+    setBootLines(["CONNECTING TO SOURCE NODE...","DECRYPTING LOCATION DATA...","SIGNAL DETECTED...",`LOADING CLUE ${num} OF ${total||0}...`]);
     setPhase("boot");
   };
 
@@ -648,6 +728,7 @@ function ClueScreen({user,onLogout}){
   };
 
   const p=progress();
+  const assignedTotal=db.getAssignedClues(user.id).length;
 
   if(showQR)return(
     <div style={{minHeight:"100vh",display:"flex",alignItems:"center",justifyContent:"center",padding:20}}>
@@ -664,7 +745,7 @@ function ClueScreen({user,onLogout}){
         <div style={{fontFamily:"Orbitron",fontSize:15,color:"#00ff9f",textShadow:"0 0 10px #00ff9f55"}}>{user.team_name}</div>
       </div>
       <div style={{textAlign:"right"}}>
-        <div style={{fontFamily:"'Share Tech Mono'",fontSize:10,color:"#00ff9f66"}}>FRAGMENTS: {p.clues_completed}/5</div>
+        <div style={{fontFamily:"'Share Tech Mono'",fontSize:10,color:"#00ff9f66"}}>FRAGMENTS: {p.clues_completed}/{assignedTotal||0}</div>
         <button style={{...S.btn,fontSize:9,padding:"3px 8px",marginTop:4}} onClick={onLogout}>LOGOUT</button>
       </div>
     </div>
@@ -723,7 +804,7 @@ function ClueScreen({user,onLogout}){
 
         {phase==="clue"&&clue&&(
           <div style={S.panel} className="active-panel terminal-shell">
-            <div style={S.hdr}>[ NODE {clue.clue_number} OF 5 â€” DECRYPTED ]</div>
+            <div style={S.hdr}>[ NODE {clue.clue_number} OF {assignedTotal||0} â€” DECRYPTED ]</div>
             <div style={{fontFamily:"'Share Tech Mono'",color:"#00ff9f",fontSize:14,lineHeight:1.9,whiteSpace:"pre-line",padding:"12px 14px",border:"1px solid #00ff9f1a",background:"rgba(0,255,159,.025)",marginBottom:20,borderRadius:2}}>
               {clue.clue_text}
             </div>
@@ -734,6 +815,13 @@ function ClueScreen({user,onLogout}){
               <button style={{...S.btn,flex:1}} onClick={()=>!huntExpired&&verify(code)} disabled={huntExpired}>VERIFY CODE</button>
               <button style={{...S.btn,flex:1,borderColor:"#00ccff",color:"#00ccff"}} onClick={()=>!huntExpired&&setShowQR(true)} disabled={huntExpired}>SCAN QR</button>
             </div>
+          </div>
+        )}
+
+        {phase==="clue"&&!clue&&(
+          <div style={S.panel} className="terminal-shell">
+            <div style={{fontFamily:"Orbitron",fontSize:13,color:"#00ccff",letterSpacing:2,marginBottom:8}}>NO ASSIGNED CLUES</div>
+            <div style={{fontFamily:"'Share Tech Mono'",fontSize:12,color:"#00ff9f66",lineHeight:1.8}}>Ask OPERATOR to assign clues in ADMIN &gt; MANAGE.</div>
           </div>
         )}
 
@@ -819,7 +907,7 @@ function ScRow({lbl,val,hi}){
 // â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 function Admin({user,onLogout}){
   const [tab,setTab]=useState("monitor");
-  const TABS=[{id:"monitor",lbl:"MONITOR"},{id:"queue",lbl:"ESCAPE QUEUE"},{id:"board",lbl:"LEADERBOARD"},{id:"manage",lbl:"MANAGE"},{id:"qrcodes",lbl:"QR CODES"}];
+  const TABS=[{id:"monitor",lbl:"MONITOR"},{id:"queue",lbl:"ESCAPE QUEUE"},{id:"board",lbl:"LEADERBOARD"},{id:"manage",lbl:"MANAGE"},{id:"clues",lbl:"CLUES"},{id:"qrcodes",lbl:"QR CODES"}];
   return(
     <div style={{minHeight:"100vh",padding:"16px"}}>
       <div style={{maxWidth:900,margin:"0 auto"}}>
@@ -837,6 +925,7 @@ function Admin({user,onLogout}){
         {tab==="queue"&&<Queue/>}
         {tab==="board"&&<Board/>}
         {tab==="manage"&&<Manage/>}
+        {tab==="clues"&&<CluesPage/>}
         {tab==="qrcodes"&&<QRCodes/>}
       </div>
     </div>
@@ -860,7 +949,7 @@ function Monitor(){
                 <tr key={u.id} style={{borderBottom:"1px solid #00ff9f0a"}}>
                   <td style={{padding:"8px 10px",color:"#00ff9f",fontFamily:"Orbitron",fontSize:11}}>{u.team_name}</td>
                   <td style={{padding:"8px 10px",color:"#ffcc00"}}>{p?.current_clue||"â€”"}</td>
-                  <td style={{padding:"8px 10px"}}>{p?.clues_completed||0}/5</td>
+                  <td style={{padding:"8px 10px"}}>{p?.clues_completed||0}/{db.getAssignedClues(u.id).length}</td>
                   <td style={{padding:"8px 10px",color:"#00ff9f66"}}>{p?.hunt_start_time?new Date(p.hunt_start_time).toLocaleTimeString():"â€”"}</td>
                   <td style={{padding:"8px 10px",color:"#00ff9f66"}}>{p?.hunt_finish_time?new Date(p.hunt_finish_time).toLocaleTimeString():"â€”"}</td>
                   <td style={{padding:"8px 10px"}}>
@@ -950,7 +1039,7 @@ function Board(){
               <tr key={r.id} style={{borderBottom:"1px solid #00ff9f0a",background:i===0?"rgba(0,255,159,0.04)":"transparent"}}>
                 <td style={{padding:"8px 10px",color:i===0?"#ffcc00":"#00ff9f55",fontFamily:"Orbitron",fontWeight:i===0?"bold":"normal"}}>#{i+1}</td>
                 <td style={{padding:"8px 10px",color:"#00ff9f",fontFamily:"Orbitron",fontSize:10}}>{r.team_name}</td>
-                <td style={{padding:"8px 10px"}}>{r.p?.clues_completed||0}/5</td>
+                <td style={{padding:"8px 10px"}}>{r.p?.clues_completed||0}/{db.getAssignedClues(r.id).length}</td>
                 <td style={{padding:"8px 10px",color:"#00ff9f"}}>{r.sc.huntScore}</td>
                 <td style={{padding:"8px 10px",color:"#00ccff"}}>{r.sc.escapeScore}</td>
                 <td style={{padding:"8px 10px",fontFamily:"Orbitron",fontSize:i===0?16:13,color:i===0?"#ffcc00":"#00ff9f"}}>{r.sc.total}</td>
@@ -967,16 +1056,40 @@ function Board(){
 function Manage(){
   const [teams,setTeams]=useState(db.getAllUsers());
   const [nt,setNt]=useState({team_name:"",password:"",slot:""});
-  const [editClue,setEditClue]=useState(null);
-  const [ce,setCe]=useState({});
+  const [selectedTeam,setSelectedTeam]=useState(db.getAllUsers()[0]?.id||"");
+  const [newClueId,setNewClueId]=useState("");
   const [msg,setMsg]=useState("");
-  const [expandTeam,setExpandTeam]=useState(null);
+  const [,tick]=useState(0);
   const flash=(m)=>{setMsg(m);setTimeout(()=>setMsg(""),2500)};
+  const allClues=db.getClueDatabase();
+  const assigned=selectedTeam?db.getAssignedClues(selectedTeam):[];
+
+  useEffect(()=>{
+    if(!selectedTeam&&teams[0]?.id)setSelectedTeam(teams[0].id);
+    if(selectedTeam&&!teams.find(t=>t.id===selectedTeam))setSelectedTeam(teams[0]?.id||"");
+  },[teams,selectedTeam]);
 
   const addTeam=()=>{
     if(!nt.team_name||!nt.password)return;
-    db.addTeam(nt);
-    setTeams(db.getAllUsers());setNt({team_name:"",password:"",slot:""});flash("TEAM CREATED // CLUES AUTO-GENERATED");
+    const id=db.addTeam(nt);
+    setTeams(db.getAllUsers());setNt({team_name:"",password:"",slot:""});flash("TEAM CREATED // ASSIGN CLUES IN MANAGE");
+    setSelectedTeam(id);
+    tick(t=>t+1);
+  };
+
+  const assignClue=()=>{
+    if(!selectedTeam||!newClueId)return;
+    const ok=db.assignClue(selectedTeam,newClueId);
+    flash(ok?"CLUE ASSIGNED":"CLUE ALREADY ASSIGNED");
+    if(ok)setNewClueId("");
+    tick(t=>t+1);
+  };
+
+  const removeClue=(clueId)=>{
+    if(!selectedTeam)return;
+    db.unassignClue(selectedTeam,clueId);
+    flash("CLUE REMOVED");
+    tick(t=>t+1);
   };
 
   return(
@@ -994,48 +1107,146 @@ function Manage(){
       </div>
 
       <div style={{...S.panel,}} className="terminal-shell">
+        <div style={S.hdr}>[ TEAM CLUE ASSIGNMENT ]</div>
+        <span style={S.lbl}>SELECT TEAM</span>
+        <select style={{...S.input,marginBottom:12}} value={selectedTeam} onChange={e=>setSelectedTeam(e.target.value)}>
+          {teams.map(t=><option key={t.id} value={t.id}>{t.team_name}</option>)}
+        </select>
+
+        <div style={{fontFamily:"Orbitron",fontSize:10,color:"#00ccff",letterSpacing:2,marginBottom:8}}>ASSIGNED CLUES</div>
+        <div style={{overflowX:"auto",marginBottom:12}}>
+          <table style={{width:"100%",borderCollapse:"collapse",fontFamily:"'Share Tech Mono'",fontSize:12,minWidth:560}}>
+            <thead><tr>{["#","CLUE TITLE","CODE","ACTION"].map(h=><th key={h} style={{padding:"8px 10px",borderBottom:"1px solid #00ff9f22",color:"#00ccff",textAlign:"left",fontFamily:"Orbitron",fontSize:9,letterSpacing:1}}>{h}</th>)}</tr></thead>
+            <tbody>
+              {assigned.map((c,i)=>(
+                <tr key={c.id} style={{borderBottom:"1px solid #00ff9f0a"}}>
+                  <td style={{padding:"8px 10px",color:"#00ff9f55"}}>{i+1}</td>
+                  <td style={{padding:"8px 10px",color:"#00ff9f"}}>{c.title}</td>
+                  <td style={{padding:"8px 10px",color:"#00ccff"}}>{c.validationCode}</td>
+                  <td style={{padding:"8px 10px"}}>
+                    <button style={{...S.btn,fontSize:9,padding:"3px 10px",borderColor:"#ff4444",color:"#ff4444"}} onClick={()=>removeClue(c.id)}>REMOVE</button>
+                  </td>
+                </tr>
+              ))}
+              {assigned.length===0&&<tr><td colSpan={4} style={{padding:"12px 10px",color:"#00ff9f44",textAlign:"center"}}>NO ASSIGNED CLUES.</td></tr>}
+            </tbody>
+          </table>
+        </div>
+
+        <div style={{fontFamily:"Orbitron",fontSize:10,color:"#00ccff",letterSpacing:2,marginBottom:8}}>ADD CLUE</div>
+        <div style={{display:"grid",gridTemplateColumns:"1fr auto",gap:8}}>
+          <select style={S.input} value={newClueId} onChange={e=>setNewClueId(e.target.value)}>
+            <option value="">SELECT CLUE</option>
+            {allClues.map(c=><option key={c.id} value={c.id}>{c.title} // {c.validationCode}</option>)}
+          </select>
+          <button style={S.btn} onClick={assignClue}>ASSIGN CLUE</button>
+        </div>
+      </div>
+
+      <div style={{...S.panel,}} className="terminal-shell">
         <div style={S.hdr}>[ TEAM CONTROLS ]</div>
         {teams.map(u=>(
-          <div key={u.id} style={{borderBottom:"1px solid #00ff9f0d",padding:"6px 0"}}>
-            <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",padding:"4px 0"}}>
-              <span style={{fontFamily:"'Share Tech Mono'",color:"#00ff9f",fontSize:13,cursor:"pointer"}} onClick={()=>setExpandTeam(expandTeam===u.id?null:u.id)}>
-                {expandTeam===u.id?"â–¼":"â–¶"} {u.team_name}
-              </span>
-              <button style={{...S.btn,fontSize:9,padding:"3px 8px",borderColor:"#ff4444",color:"#ff4444"}} onClick={()=>{db.resetTeam(u.id);flash(`${u.team_name} RESET`)}}>RESET</button>
-            </div>
-            {expandTeam===u.id&&(
-              <div style={{marginTop:8,paddingLeft:16,borderLeft:"1px solid #00ff9f1a"}}>
-                {DB.clues.filter(c=>c.team_id===u.id).map(c=>{
-                  const isEditing=editClue===c.id;
-                  return(
-                    <div key={c.id} style={{padding:"8px 0",borderBottom:"1px solid #00ff9f0d"}}>
-                      <div style={{display:"flex",justifyContent:"space-between",alignItems:"center"}}>
-                        <span style={{fontFamily:"'Share Tech Mono'",fontSize:11,color:"#00ccff"}}>CLUE {c.clue_number} // {c.validation_code}</span>
-                        <button style={{...S.btn,fontSize:9,padding:"2px 8px"}} onClick={()=>{setEditClue(isEditing?null:c.id);setCe({...c})}}>
-                          {isEditing?"CANCEL":"EDIT"}
-                        </button>
-                      </div>
-                      <div style={{fontFamily:"'Share Tech Mono'",fontSize:11,color:"#00ff9f55",marginTop:4,whiteSpace:"pre-line"}}>{c.clue_text.substring(0,60)}...</div>
-                      {isEditing&&(
-                        <div style={{marginTop:8}}>
-                          <textarea rows={4} value={ce.clue_text} onChange={e=>setCe(p=>({...p,clue_text:e.target.value}))}/>
-                          <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:6,marginTop:6}}>
-                            <input style={S.input} value={ce.validation_code} onChange={e=>setCe(p=>({...p,validation_code:e.target.value.toUpperCase()}))} placeholder="VALIDATION CODE"/>
-                            <input style={S.input} value={ce.qr_value} onChange={e=>setCe(p=>({...p,qr_value:e.target.value.toUpperCase()}))} placeholder="QR VALUE"/>
-                          </div>
-                          <button style={{...S.btn,marginTop:6}} onClick={()=>{
-                            const i=DB.clues.findIndex(x=>x.id===c.id);if(i>=0)DB.clues[i]={...DB.clues[i],...ce};
-                            setEditClue(null);flash("CLUE UPDATED");
-                          }}>SAVE CLUE</button>
-                        </div>
-                      )}
-                    </div>
-                  );
-                })}
-              </div>
-            )}
+          <div key={u.id} style={{display:"flex",justifyContent:"space-between",alignItems:"center",padding:"6px 0",borderBottom:"1px solid #00ff9f0d"}}>
+            <span style={{fontFamily:"'Share Tech Mono'",color:"#00ff9f",fontSize:13}}>{u.team_name}</span>
+            <button style={{...S.btn,fontSize:9,padding:"3px 8px",borderColor:"#ff4444",color:"#ff4444"}} onClick={()=>{db.resetTeam(u.id);flash(`${u.team_name} RESET`);tick(t=>t+1);}}>RESET</button>
           </div>
         ))}
+      </div>
+    </div>
+  );
+}
+
+function CluesPage(){
+  const [form,setForm]=useState({title:"",description:"",validationCode:"",hint:"",difficulty:""});
+  const [editingId,setEditingId]=useState(null);
+  const [msg,setMsg]=useState("");
+  const [,tick]=useState(0);
+  const flash=(m)=>{setMsg(m);setTimeout(()=>setMsg(""),2500)};
+  const clues=db.getClueDatabase();
+  const payloadFor=(clue)=>toCluePayload(clue);
+
+  const submit=()=>{
+    if(!form.title.trim()||!form.description.trim()||!form.validationCode.trim()){flash("TITLE / DESCRIPTION / VALIDATION CODE REQUIRED");return;}
+    if(editingId){
+      db.updateClue(editingId,{title:form.title,description:form.description,validationCode:form.validationCode,hint:form.hint,difficulty:form.difficulty});
+      flash("CLUE UPDATED");
+    }else{
+      db.addClue(form);
+      flash("CLUE ADDED");
+    }
+    setForm({title:"",description:"",validationCode:"",hint:"",difficulty:""});
+    setEditingId(null);
+    tick(t=>t+1);
+  };
+
+  const startEdit=(clue)=>{
+    setEditingId(clue.id);
+    setForm({title:clue.title,description:clue.description,validationCode:clue.validationCode,hint:clue.hint||"",difficulty:clue.difficulty||""});
+  };
+
+  const remove=(clue)=>{
+    db.deleteClue(clue.id);
+    flash("CLUE DELETED");
+    if(editingId===clue.id){setEditingId(null);setForm({title:"",description:"",validationCode:"",hint:"",difficulty:""});}
+    tick(t=>t+1);
+  };
+
+  const downloadQR=async(clue)=>{
+    const src=await generateQRDataUrl(payloadFor(clue),240,"photos/logo.png");
+    if(!src)return;
+    const a=document.createElement("a");
+    a.href=src;
+    a.download=`QR_${payloadFor(clue)}.png`;
+    a.click();
+  };
+
+  return(
+    <div>
+      {msg&&<div style={{color:"#00ff9f",fontFamily:"'Share Tech Mono'",fontSize:12,marginBottom:12,padding:"8px 10px",border:"1px solid #00ff9f33",background:"#00ff9f08",animation:"fadeIn .3s"}}>&gt; {msg}</div>}
+      <div style={{...S.panel}} className="terminal-shell">
+        <div style={S.hdr}>[ CLUE DATABASE ]</div>
+        <span style={S.lbl}>CLUE TITLE</span>
+        <input style={{...S.input,marginBottom:8}} value={form.title} onChange={e=>setForm(p=>({...p,title:e.target.value}))}/>
+        <span style={S.lbl}>CLUE DESCRIPTION</span>
+        <textarea rows={4} value={form.description} onChange={e=>setForm(p=>({...p,description:e.target.value}))}/>
+        <div style={{height:8}}/>
+        <span style={S.lbl}>VALIDATION CODE</span>
+        <input style={{...S.input,marginBottom:8}} value={form.validationCode} onChange={e=>setForm(p=>({...p,validationCode:e.target.value.toUpperCase()}))}/>
+        <span style={S.lbl}>HINT</span>
+        <textarea rows={3} value={form.hint} onChange={e=>setForm(p=>({...p,hint:e.target.value}))}/>
+        <div style={{height:8}}/>
+        <span style={S.lbl}>DIFFICULTY (OPTIONAL)</span>
+        <input style={{...S.input,marginBottom:12}} value={form.difficulty} onChange={e=>setForm(p=>({...p,difficulty:e.target.value}))}/>
+        <button style={S.btn} onClick={submit}>{editingId?"UPDATE CLUE":"ADD CLUE"}</button>
+      </div>
+
+      <div style={{...S.panel}} className="terminal-shell">
+        <div style={S.hdr}>[ CLUE LIST ]</div>
+        <div style={{overflowX:"auto"}}>
+          <table style={{width:"100%",borderCollapse:"collapse",fontFamily:"'Share Tech Mono'",fontSize:12,minWidth:760}}>
+            <thead><tr>{["TITLE","CODE","QR","ACTIONS"].map(h=><th key={h} style={{padding:"8px 10px",borderBottom:"1px solid #00ff9f22",color:"#00ccff",textAlign:"left",fontFamily:"Orbitron",fontSize:9,letterSpacing:1}}>{h}</th>)}</tr></thead>
+            <tbody>
+              {clues.map(c=>(
+                <tr key={c.id} style={{borderBottom:"1px solid #00ff9f0a"}}>
+                  <td style={{padding:"8px 10px"}}>
+                    <div style={{fontFamily:"Orbitron",fontSize:11,color:"#00ff9f"}}>{c.title}</div>
+                    <div style={{fontSize:10,color:"#00ff9f55"}}>{c.id}</div>
+                  </td>
+                  <td style={{padding:"8px 10px",color:"#00ccff"}}>{c.validationCode}</td>
+                  <td style={{padding:"8px 10px"}}><QRDisplay value={payloadFor(c)} logoSrc="photos/logo.png" size={86}/></td>
+                  <td style={{padding:"8px 10px"}}>
+                    <div style={{display:"flex",gap:6,flexWrap:"wrap"}}>
+                      <button style={{...S.btn,fontSize:9,padding:"3px 8px"}} onClick={()=>startEdit(c)}>EDIT</button>
+                      <button style={{...S.btn,fontSize:9,padding:"3px 8px",borderColor:"#ff4444",color:"#ff4444"}} onClick={()=>remove(c)}>DELETE</button>
+                      <button style={{...S.btn,fontSize:9,padding:"3px 8px",borderColor:"#00ccff",color:"#00ccff"}} onClick={()=>downloadQR(c)}>DOWNLOAD QR</button>
+                    </div>
+                  </td>
+                </tr>
+              ))}
+              {clues.length===0&&<tr><td colSpan={4} style={{padding:"18px 10px",color:"#00ff9f44",textAlign:"center"}}>NO CLUES IN DATABASE.</td></tr>}
+            </tbody>
+          </table>
+        </div>
       </div>
     </div>
   );
@@ -1046,13 +1257,8 @@ function Manage(){
 // â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 function QRCodes(){
   const [selTeam,setSelTeam]=useState("t1");
-  const [qrList,setQrList]=useState([]);
   const teams=db.getAllUsers();
-
-  useEffect(()=>{
-    const clues=DB.clues.filter(c=>c.team_id===selTeam);
-    setQrList(clues);
-  },[selTeam]);
+  const qrList=db.getAssignedClues(selTeam);
 
   const downloadQR=(dataUrl,filename)=>{
     const a=document.createElement('a');a.href=dataUrl;a.download=filename;a.click();
@@ -1077,23 +1283,23 @@ function QRCodes(){
       </div>
 
       <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fill,minmax(240px,1fr))",gap:16}}>
-        {qrList.map(c=>(
-          <QRCard key={c.id} clue={c} onDownload={downloadQR} onPrint={printQR}/>
+        {qrList.map((c,idx)=>(
+          <QRCard key={c.id} clue={c} index={idx+1} onDownload={downloadQR} onPrint={printQR}/>
         ))}
       </div>
     </div>
   );
 }
 
-function QRCard({clue,onDownload,onPrint}){
+function QRCard({clue,index,onDownload,onPrint}){
   const [qrSrc,setQrSrc]=useState(null);
-  const [payload,setPayload]=useState(clue.qr_value);
+  const [payload,setPayload]=useState(toCluePayload(clue));
   useEffect(()=>{
     let active=true;
     (async()=>{
-      let value=clue.qr_value;
+      let value=toCluePayload(clue);
       try{
-        const data=await api.getQRData(clue.team_id,clue.clue_number);
+        const data=await api.getQRData(clue.team_id||null,index);
         if(data?.payload)value=data.payload;
       }catch(_){}
       if(!active)return;
@@ -1102,16 +1308,16 @@ function QRCard({clue,onDownload,onPrint}){
       if(active)setQrSrc(src);
     })();
     return()=>{active=false;};
-  },[clue.qr_value,clue.team_id,clue.clue_number]);
+  },[clue.id,clue.validationCode,index]);
 
   return(
     <div style={{...S.panel,textAlign:"center"}} className="terminal-shell">
-      <div style={{fontFamily:"Orbitron",fontSize:10,color:"#00ccff",letterSpacing:2,marginBottom:8}}>CLUE {clue.clue_number}</div>
+      <div style={{fontFamily:"Orbitron",fontSize:10,color:"#00ccff",letterSpacing:2,marginBottom:8}}>CLUE {index}</div>
       <div style={{fontFamily:"'Share Tech Mono'",fontSize:11,color:"#00ff9f",marginBottom:12,letterSpacing:1}}>{payload}</div>
       <div style={{display:"flex",justifyContent:"center",marginBottom:12}}>
         <QRDisplay value={payload} logoSrc="photos/logo.png" size={160}/>
       </div>
-      <div style={{fontFamily:"'Share Tech Mono'",fontSize:9,color:"#00ff9f33",marginBottom:10,lineHeight:1.5}}>VALIDATION: {clue.validation_code}</div>
+      <div style={{fontFamily:"'Share Tech Mono'",fontSize:9,color:"#00ff9f33",marginBottom:10,lineHeight:1.5}}>VALIDATION: {clue.validationCode}</div>
       <div style={{display:"flex",gap:6,justifyContent:"center"}}>
         <button style={{...S.btn,fontSize:9,padding:"4px 10px"}} onClick={()=>qrSrc&&onDownload(qrSrc,`QR_${payload}.png`)}>â¬‡ DL</button>
         <button style={{...S.btn,fontSize:9,padding:"4px 10px",borderColor:"#00ccff",color:"#00ccff"}} onClick={()=>qrSrc&&onPrint(qrSrc,payload)}>âŽ™ PRINT</button>
