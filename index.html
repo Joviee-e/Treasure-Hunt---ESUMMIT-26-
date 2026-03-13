@@ -247,31 +247,79 @@ function calcScore(p,q){
   return{huntScore:h,escapeScore:e,total:h+e};
 }
 
-const API_ENDPOINTS={
-  login:"/api/login",
-  validateCode:"/api/validate-code",
-  getClue:"/api/get-clue",
-  qrData:"/api/qr-data",
-};
+const API_BASE="http://localhost:5000";
+let ACTIVE_USER_ROLE=null;
+const isAdminSession=()=>ACTIVE_USER_ROLE==="admin";
+const requireAdmin=()=>{if(!isAdminSession())throw new Error("ACCESS DENIED");};
 
-async function apiPost(url,payload){
-  const res=await fetch(url,{
-    method:"POST",
-    headers:{
-      "Content-Type":"application/json",
-      "Accept":"application/json",
-    },
-    body:JSON.stringify(payload),
-  });
-  if(!res.ok)throw new Error(`API ${url} failed with ${res.status}`);
-  return res.json();
+async function api(url, method="GET", data=null){
+  const options={method,headers:{"Content-Type":"application/json"}};
+  if(data)options.body=JSON.stringify(data);
+  const res=await fetch(API_BASE+url, options);
+  let json={};
+  try{json=await res.json();}catch(_){}
+  if(!res.ok)throw new Error(json?.error||`SYSTEM ERROR (${res.status})`);
+  return json;
 }
 
-const api={
-  login:(teamName,password)=>apiPost(API_ENDPOINTS.login,{teamName,password}),
-  validateCode:(teamId,code,currentClue)=>apiPost(API_ENDPOINTS.validateCode,{teamId,code,currentClue}),
-  getClue:(teamId,clueNumber)=>apiPost(API_ENDPOINTS.getClue,{teamId,clueNumber}),
-  getQRData:(teamId,clueNumber)=>apiPost(API_ENDPOINTS.qrData,{teamId,clueNumber}),
+function applyTeamsFromApi(teams){
+  const admin=DB.users.find(u=>u.role==="admin")||{id:"admin1",team_name:"OPERATOR",password:"zion2077",role:"admin",slot:null};
+  DB.users=[admin,...(teams||[]).map(t=>({id:t.id,team_name:t.team_name,password:"",role:"team",slot:null}))];
+  const teamIds=new Set((teams||[]).map(t=>t.id));
+  DB.team_progress=DB.team_progress.filter(p=>teamIds.has(p.team_id));
+  for(const t of (teams||[])){
+    if(!DB.team_progress.find(p=>p.team_id===t.id)){
+      DB.team_progress.push({team_id:t.id,current_clue:1,clues_completed:0,hunt_start_time:null,hunt_finish_time:null,bonus_ciphers:0});
+    }
+    if(!DB.team_clues[t.id])DB.team_clues[t.id]=[];
+  }
+}
+
+function applyCluesFromApi(clues){
+  DB.clue_database=(clues||[]).map(c=>({
+    id:c.id,title:c.title,description:c.description,validationCode:c.validationCode,hint:c.hint||"",difficulty:c.difficulty||""
+  }));
+}
+
+async function refreshTeamsFromApi(){
+  const out=await api("/api/teams");
+  applyTeamsFromApi(out.teams||[]);
+  return DB.users.filter(u=>u.role==="team");
+}
+
+async function refreshCluesFromApi(){
+  const out=await api("/api/clues");
+  applyCluesFromApi(out.clues||[]);
+  return DB.clue_database;
+}
+
+async function refreshAssignmentFromApi(teamId){
+  if(!teamId)return [];
+  const out=await api(`/api/assignment/${teamId}`);
+  const clues=(out.clues||[]).map(c=>({
+    id:c.id,title:c.title,description:c.description,validationCode:c.validationCode,hint:c.hint||"",difficulty:c.difficulty||""
+  }));
+  DB.team_clues[teamId]=clues.map(c=>c.id);
+  db.normalizeTeamProgress(teamId);
+  return clues;
+}
+
+async function refreshProgressFromApi(){
+  const out=await api("/api/progress");
+  for(const p of (out.progress||[])){
+    const i=DB.team_progress.findIndex(x=>x.team_id===p.teamId);
+    const row={team_id:p.teamId,current_clue:p.currentClue||1,clues_completed:p.cluesCompleted||0,hunt_start_time:p.startedAt?new Date(p.startedAt).getTime():null,hunt_finish_time:p.finished?Date.now():null,bonus_ciphers:0};
+    if(i>=0)DB.team_progress[i]={...DB.team_progress[i],...row}; else DB.team_progress.push(row);
+  }
+}
+
+const apiSvc={
+  login:(teamName,password)=>api("/api/login","POST",{teamName,password}),
+  validateCode:(teamId,code)=>api("/api/validate","POST",{teamId,code}),
+  getQRData:async(_teamId,clueNumber)=>{
+    const clue=db.getClue(_teamId,clueNumber);
+    return {payload:clue?.qr_value||null};
+  },
 };
 
 // â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
@@ -569,7 +617,7 @@ function Login({onLogin}){
     setErr("");setLoading(true);
     await new Promise(r=>setTimeout(r,450));
     try{
-      const data=await api.login(tn,pass);
+      const data=await apiSvc.login(tn,pass);
       if(data?.user){onLogin(data.user);return;}
     }catch(_){ }
     const u=db.getUser(tn,pass);
@@ -674,24 +722,22 @@ function ClueScreen({user,onLogout}){
 
   const loadClue=async(num)=>{
     const total=db.getAssignedClues(user.id).length;
-    let c=null;
-    try{
-      const data=await api.getClue(user.id,num);
-      c=data?.clue||null;
-      if(c&&c.validationCode&&!c.validation_code){
-        c={...c,clue_number:num,clue_text:c.description||"",validation_code:c.validationCode,qr_value:toCluePayload(c),next_clue:num<total?num+1:null};
-      }
-    }catch(_){}
-    if(!c)c=db.getClue(user.id,num);
+    const c=db.getClue(user.id,num);
     setClue(c);setCode("");setCodeErr("");
     setBootLines(["CONNECTING TO SOURCE NODE...","DECRYPTING LOCATION DATA...","SIGNAL DETECTED...",`LOADING CLUE ${num} OF ${total||0}...`]);
     setPhase("boot");
   };
 
   useEffect(()=>{
-    const p=progress();
-    if(!p.hunt_start_time)db.updateProgress(user.id,{hunt_start_time:Date.now()});
-    loadClue(progress().current_clue);
+    (async()=>{
+      try{
+        await refreshAssignmentFromApi(user.id);
+        await refreshProgressFromApi();
+      }catch(_){}
+      const p=progress();
+      if(!p.hunt_start_time)db.updateProgress(user.id,{hunt_start_time:Date.now()});
+      loadClue(progress().current_clue);
+    })();
   },[]);
 
   useEffect(()=>{
@@ -708,8 +754,12 @@ function ClueScreen({user,onLogout}){
     const v=val.trim().toUpperCase();
     let valid=false;
     try{
-      const data=await api.validateCode(user.id,v,clue.clue_number);
+      const data=await apiSvc.validateCode(user.id,v);
       valid=!!data?.valid;
+      if(valid){
+        if(data?.currentClue)db.updateProgress(user.id,{current_clue:data.currentClue});
+        if(typeof data?.completed==="number")db.updateProgress(user.id,{clues_completed:data.completed});
+      }
     }catch(_){}
     if(!valid)valid=v===clue.validation_code.toUpperCase()||v===clue.qr_value.toUpperCase();
     if(valid){
@@ -934,7 +984,19 @@ function Admin({user,onLogout}){
 
 function Monitor(){
   const [,tick]=useState(0);
-  useEffect(()=>{const iv=setInterval(()=>tick(t=>t+1),3000);return()=>clearInterval(iv)},[]);
+  useEffect(()=>{
+    const pull=async()=>{
+      try{
+        const teams=await refreshTeamsFromApi();
+        await Promise.all(teams.map(t=>refreshAssignmentFromApi(t.id)));
+        await refreshProgressFromApi();
+      }catch(_){}
+      tick(t=>t+1);
+    };
+    pull();
+    const iv=setInterval(pull,3000);
+    return()=>clearInterval(iv);
+  },[]);
   const teams=db.getAllUsers();
   return(
     <div style={{...S.panel,}} className="terminal-shell">
@@ -1018,7 +1080,19 @@ function Queue(){
 
 function Board(){
   const [,tick]=useState(0);
-  useEffect(()=>{const iv=setInterval(()=>tick(t=>t+1),5000);return()=>clearInterval(iv)},[]);
+  useEffect(()=>{
+    const pull=async()=>{
+      try{
+        const teams=await refreshTeamsFromApi();
+        await Promise.all(teams.map(t=>refreshAssignmentFromApi(t.id)));
+        await refreshProgressFromApi();
+      }catch(_){}
+      tick(t=>t+1);
+    };
+    pull();
+    const iv=setInterval(pull,5000);
+    return()=>clearInterval(iv);
+  },[]);
   const teams=db.getAllUsers();
   const rows=teams.map(u=>{
     const p=db.getProgress(u.id);
@@ -1054,47 +1128,96 @@ function Board(){
 }
 
 function Manage(){
-  const [teams,setTeams]=useState(db.getAllUsers());
+  const [teams,setTeams]=useState([]);
   const [nt,setNt]=useState({team_name:"",password:"",slot:""});
-  const [selectedTeam,setSelectedTeam]=useState(db.getAllUsers()[0]?.id||"");
+  const [selectedTeam,setSelectedTeam]=useState("");
   const [newClueId,setNewClueId]=useState("");
   const [msg,setMsg]=useState("");
+  const [err,setErr]=useState("");
   const [,tick]=useState(0);
   const flash=(m)=>{setMsg(m);setTimeout(()=>setMsg(""),2500)};
   const allClues=db.getClueDatabase();
   const assigned=selectedTeam?db.getAssignedClues(selectedTeam):[];
 
   useEffect(()=>{
+    (async()=>{
+      try{
+        await refreshTeamsFromApi();
+        await refreshCluesFromApi();
+        await refreshProgressFromApi();
+        const list=db.getAllUsers();
+        setTeams(list);
+        if(!selectedTeam&&list[0]?.id)setSelectedTeam(list[0].id);
+        setErr("");
+      }catch(e){setErr(String(e.message||"SYSTEM ERROR"));} 
+      tick(t=>t+1);
+    })();
+  },[]);
+
+  useEffect(()=>{
     if(!selectedTeam&&teams[0]?.id)setSelectedTeam(teams[0].id);
     if(selectedTeam&&!teams.find(t=>t.id===selectedTeam))setSelectedTeam(teams[0]?.id||"");
   },[teams,selectedTeam]);
 
-  const addTeam=()=>{
-    if(!nt.team_name||!nt.password)return;
-    const id=db.addTeam(nt);
-    setTeams(db.getAllUsers());setNt({team_name:"",password:"",slot:""});flash("TEAM CREATED // ASSIGN CLUES IN MANAGE");
-    setSelectedTeam(id);
-    tick(t=>t+1);
-  };
-
-  const assignClue=()=>{
-    if(!selectedTeam||!newClueId)return;
-    const ok=db.assignClue(selectedTeam,newClueId);
-    flash(ok?"CLUE ASSIGNED":"CLUE ALREADY ASSIGNED");
-    if(ok)setNewClueId("");
-    tick(t=>t+1);
-  };
-
-  const removeClue=(clueId)=>{
+  useEffect(()=>{
     if(!selectedTeam)return;
-    db.unassignClue(selectedTeam,clueId);
-    flash("CLUE REMOVED");
-    tick(t=>t+1);
+    (async()=>{
+      try{
+        await refreshAssignmentFromApi(selectedTeam);
+        await refreshProgressFromApi();
+        setErr("");
+      }catch(e){setErr(String(e.message||"SYSTEM ERROR"));}
+      tick(t=>t+1);
+    })();
+  },[selectedTeam]);
+
+  const addTeam=async()=>{
+    if(!nt.team_name||!nt.password)return;
+    try{
+      requireAdmin();
+      const out=await api("/api/team","POST",{teamName:nt.team_name,password:nt.password});
+      await refreshTeamsFromApi();
+      const list=db.getAllUsers();
+      setTeams(list);
+      setNt({team_name:"",password:"",slot:""});
+      flash("TEAM CREATED // ASSIGN CLUES IN MANAGE");
+      setSelectedTeam(out?.team?.id||list[0]?.id||"");
+      setErr("");
+      tick(t=>t+1);
+    }catch(e){setErr(String(e.message||"SYSTEM ERROR"));}
+  };
+
+  const assignClue=async()=>{
+    if(!selectedTeam||!newClueId)return;
+    try{
+      requireAdmin();
+      await api("/api/assign","POST",{teamId:selectedTeam,clueId:newClueId});
+      await refreshAssignmentFromApi(selectedTeam);
+      await refreshProgressFromApi();
+      flash("CLUE ASSIGNED");
+      setNewClueId("");
+      setErr("");
+      tick(t=>t+1);
+    }catch(e){setErr(String(e.message||"SYSTEM ERROR"));}
+  };
+
+  const removeClue=async(clueId)=>{
+    if(!selectedTeam)return;
+    try{
+      requireAdmin();
+      await api("/api/remove-clue","POST",{teamId:selectedTeam,clueId});
+      await refreshAssignmentFromApi(selectedTeam);
+      await refreshProgressFromApi();
+      flash("CLUE REMOVED");
+      setErr("");
+      tick(t=>t+1);
+    }catch(e){setErr(String(e.message||"SYSTEM ERROR"));}
   };
 
   return(
     <div>
       {msg&&<div style={{color:"#00ff9f",fontFamily:"'Share Tech Mono'",fontSize:12,marginBottom:12,padding:"8px 10px",border:"1px solid #00ff9f33",background:"#00ff9f08",animation:"fadeIn .3s"}}>&gt; {msg}</div>}
+      <Err msg={err}/>
 
       <div style={{...S.panel,}} className="terminal-shell">
         <div style={S.hdr}>[ CREATE TEAM ]</div>
@@ -1160,23 +1283,41 @@ function CluesPage(){
   const [form,setForm]=useState({title:"",description:"",validationCode:"",hint:"",difficulty:""});
   const [editingId,setEditingId]=useState(null);
   const [msg,setMsg]=useState("");
+  const [err,setErr]=useState("");
+  const [clues,setClues]=useState([]);
   const [,tick]=useState(0);
   const flash=(m)=>{setMsg(m);setTimeout(()=>setMsg(""),2500)};
-  const clues=db.getClueDatabase();
   const payloadFor=(clue)=>toCluePayload(clue);
 
-  const submit=()=>{
+  useEffect(()=>{
+    (async()=>{
+      try{
+        const list=await refreshCluesFromApi();
+        setClues([...list]);
+        setErr("");
+      }catch(e){setErr(String(e.message||"SYSTEM ERROR"));}
+    })();
+  },[]);
+
+  const submit=async()=>{
     if(!form.title.trim()||!form.description.trim()||!form.validationCode.trim()){flash("TITLE / DESCRIPTION / VALIDATION CODE REQUIRED");return;}
-    if(editingId){
-      db.updateClue(editingId,{title:form.title,description:form.description,validationCode:form.validationCode,hint:form.hint,difficulty:form.difficulty});
-      flash("CLUE UPDATED");
-    }else{
-      db.addClue(form);
-      flash("CLUE ADDED");
-    }
+    try{
+      requireAdmin();
+      if(editingId){
+        await api(`/api/clue/${editingId}`,"PUT",{title:form.title,description:form.description,validationCode:form.validationCode,hint:form.hint,difficulty:form.difficulty});
+        flash("CLUE UPDATED");
+      }else{
+        await api("/api/clue","POST",{title:form.title,description:form.description,validationCode:form.validationCode,hint:form.hint,difficulty:form.difficulty});
+        flash("CLUE ADDED");
+      }
+      const list=await refreshCluesFromApi();
+      setClues([...list]);
+      setErr("");
+      await refreshProgressFromApi();
+      tick(t=>t+1);
+    }catch(e){setErr(String(e.message||"SYSTEM ERROR")); return;}
     setForm({title:"",description:"",validationCode:"",hint:"",difficulty:""});
     setEditingId(null);
-    tick(t=>t+1);
   };
 
   const startEdit=(clue)=>{
@@ -1184,11 +1325,20 @@ function CluesPage(){
     setForm({title:clue.title,description:clue.description,validationCode:clue.validationCode,hint:clue.hint||"",difficulty:clue.difficulty||""});
   };
 
-  const remove=(clue)=>{
-    db.deleteClue(clue.id);
-    flash("CLUE DELETED");
-    if(editingId===clue.id){setEditingId(null);setForm({title:"",description:"",validationCode:"",hint:"",difficulty:""});}
-    tick(t=>t+1);
+  const remove=async(clue)=>{
+    try{
+      requireAdmin();
+      await api(`/api/clue/${clue.id}`,"DELETE");
+      const list=await refreshCluesFromApi();
+      setClues([...list]);
+      const teams=await refreshTeamsFromApi();
+      await Promise.all(teams.map(t=>refreshAssignmentFromApi(t.id)));
+      await refreshProgressFromApi();
+      flash("CLUE DELETED");
+      setErr("");
+      if(editingId===clue.id){setEditingId(null);setForm({title:"",description:"",validationCode:"",hint:"",difficulty:""});}
+      tick(t=>t+1);
+    }catch(e){setErr(String(e.message||"SYSTEM ERROR"));}
   };
 
   const downloadQR=async(clue)=>{
@@ -1203,6 +1353,7 @@ function CluesPage(){
   return(
     <div>
       {msg&&<div style={{color:"#00ff9f",fontFamily:"'Share Tech Mono'",fontSize:12,marginBottom:12,padding:"8px 10px",border:"1px solid #00ff9f33",background:"#00ff9f08",animation:"fadeIn .3s"}}>&gt; {msg}</div>}
+      <Err msg={err}/>
       <div style={{...S.panel}} className="terminal-shell">
         <div style={S.hdr}>[ CLUE DATABASE ]</div>
         <span style={S.lbl}>CLUE TITLE</span>
@@ -1256,8 +1407,30 @@ function CluesPage(){
 // QR CODE MANAGEMENT (Admin)
 // â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 function QRCodes(){
-  const [selTeam,setSelTeam]=useState("t1");
-  const teams=db.getAllUsers();
+  const [selTeam,setSelTeam]=useState("");
+  const [teams,setTeams]=useState([]);
+  const [,tick]=useState(0);
+
+  useEffect(()=>{
+    (async()=>{
+      try{
+        const ts=await refreshTeamsFromApi();
+        await refreshCluesFromApi();
+        setTeams(ts);
+        if(!selTeam&&ts[0]?.id)setSelTeam(ts[0].id);
+      }catch(_){}
+      tick(t=>t+1);
+    })();
+  },[]);
+
+  useEffect(()=>{
+    if(!selTeam)return;
+    (async()=>{
+      try{await refreshAssignmentFromApi(selTeam);}catch(_){}
+      tick(t=>t+1);
+    })();
+  },[selTeam]);
+
   const qrList=db.getAssignedClues(selTeam);
 
   const downloadQR=(dataUrl,filename)=>{
@@ -1299,7 +1472,7 @@ function QRCard({clue,index,onDownload,onPrint}){
     (async()=>{
       let value=toCluePayload(clue);
       try{
-        const data=await api.getQRData(clue.team_id||null,index);
+        const data=await apiSvc.getQRData(clue.team_id||null,index);
         if(data?.payload)value=data.payload;
       }catch(_){}
       if(!active)return;
@@ -1344,8 +1517,8 @@ function App(){
     setIntense(false);
   };
 
-  const login=(u)=>{setUser(u);setScreen("game")};
-  const logout=()=>{setUser(null);setScreen("auth")};
+  const login=(u)=>{ACTIVE_USER_ROLE=u?.role||null;setUser(u);setScreen("game")};
+  const logout=()=>{ACTIVE_USER_ROLE=null;setUser(null);setScreen("auth")};
 
   return(
     <>
