@@ -316,10 +316,6 @@ async function refreshProgressFromApi(){
 const apiSvc={
   login:(teamName,password)=>api("/api/login","POST",{teamName,password}),
   validateCode:(teamId,code)=>api("/api/validate","POST",{teamId,code}),
-  getQRData:async(_teamId,clueNumber)=>{
-    const clue=db.getClue(_teamId,clueNumber);
-    return {payload:clue?.qr_value||null};
-  },
 };
 
 // â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
@@ -1470,18 +1466,14 @@ function QRCard({clue,index,onDownload,onPrint}){
   useEffect(()=>{
     let active=true;
     (async()=>{
-      let value=toCluePayload(clue);
-      try{
-        const data=await apiSvc.getQRData(clue.team_id||null,index);
-        if(data?.payload)value=data.payload;
-      }catch(_){}
+      const value=toCluePayload(clue);
       if(!active)return;
       setPayload(value);
       const src=await generateQRDataUrl(value,200,"photos/logo.png");
       if(active)setQrSrc(src);
     })();
     return()=>{active=false;};
-  },[clue.id,clue.validationCode,index]);
+  },[clue.id,clue.validationCode]);
 
   return(
     <div style={{...S.panel,textAlign:"center"}} className="terminal-shell">
