@@ -89,7 +89,7 @@ textarea{background:rgba(0,255,159,.05);border:1px solid #00ff9f44;color:#00ff9f
 .matrix-intense canvas{animation:intense-flicker 0.3s infinite!important}
 
 /* â•â•â• QR STYLES â•â•â• */
-.qr-shell{position:relative;background:#000;border:1px solid var(--line);padding:10px;display:inline-flex;border-radius:4px;box-shadow:0 0 16px #00ff9f33}
+.qr-shell{position:relative;background:#fff;border:1px solid var(--line);padding:10px;display:inline-flex;border-radius:4px;box-shadow:0 0 16px #00ff9f33}
 .qr-canvas{line-height:0}
 .qr-canvas img,.qr-canvas canvas{display:block}
 .qr-logo-wrap{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);padding:4px;background:#fff;border-radius:8px;box-shadow:0 0 10px rgba(255,255,255,.35)}
@@ -139,7 +139,12 @@ let DB = {
   escape_queue: [],
 };
 
-const toCluePayload=(clue)=>`${String(clue.id||"").toUpperCase()}|${String(clue.validationCode||"").toUpperCase()}`;
+const QR_ERROR_CORRECTION_LEVEL = "H";
+const QR_PRINT_SIZE = 500;
+const QR_MARGIN_MODULES = 4;
+const QR_LOGO_RATIO = 0.18;
+const normalizeQrPayload=(raw)=>String(raw||"").trim().toUpperCase();
+const toCluePayload=(clue)=>normalizeQrPayload(clue?.validationCode);
 const safeFilePart=(v)=>String(v||"").replace(/[<>:"/\\|?*\x00-\x1F]/g,"_").replace(/\s+/g,"_");
 const downloadBlob=(blob,filename)=>{
   if(!blob)return;
@@ -393,7 +398,6 @@ const API_BASE =
 const IS_LOCAL_DEV = window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1";
 const normalizeInputCode=(raw)=>String(raw||"")
   .replace(/[\u2013\u2014]/g,"-")
-  .replace(/\s*\|\s*/g,"|")
   .trim()
   .toUpperCase();
     
@@ -555,13 +559,15 @@ function QRDisplay({value, logoSrc, size=160}){
     if(!qrRef.current||!value||typeof QRCode==="undefined"){setReady(false);return;}
     setReady(false);
     qrRef.current.innerHTML="";
+    const text=normalizeQrPayload(value);
+    if(!text){setReady(false);return;}
     new QRCode(qrRef.current,{
-      text:value,
+      text,
       width:size,
       height:size,
-      colorDark:"#00ff9f",
-      colorLight:"#000000",
-      correctLevel:QRCode.CorrectLevel.H
+      colorDark:"#000000",
+      colorLight:"#FFFFFF",
+      correctLevel:QRCode.CorrectLevel[QR_ERROR_CORRECTION_LEVEL]
     });
     const t=setTimeout(()=>setReady(true),30);
     return()=>clearTimeout(t);
@@ -575,41 +581,57 @@ function QRDisplay({value, logoSrc, size=160}){
       {!ready&&<div style={{position:"absolute",inset:0,display:"flex",alignItems:"center",justifyContent:"center",color:"#00ff9f44",fontSize:11,background:"rgba(0,0,0,.28)"}}>GENERATING...</div>}
       {logoSrc&&ready&&(
         <div className="qr-logo-wrap">
-          <img src={logoSrc} alt="Sponsor logo" className="qr-logo" style={{width:Math.round(size*0.22),height:Math.round(size*0.22)}}/>
+          <img src={logoSrc} alt="Sponsor logo" className="qr-logo" style={{width:Math.round(size*QR_LOGO_RATIO),height:Math.round(size*QR_LOGO_RATIO)}}/>
         </div>
       )}
     </div>
   );
 }
 
-function generateQRDataUrl(value,size=240,logoSrc="photos/logo.png"){
+function generateQRDataUrl(value,size=QR_PRINT_SIZE,logoSrc="photos/logo.png"){
   return new Promise((resolve)=>{
-    if(typeof QRCode==="undefined"||!value){resolve(null);return;}
+    const text=normalizeQrPayload(value);
+    if(typeof QRCode==="undefined"||!text){resolve(null);return;}
+    const outSize=Math.max(QR_PRINT_SIZE,Number(size)||QR_PRINT_SIZE);
     const mount=document.createElement("div");
     mount.style.cssText="position:fixed;left:-9999px;top:-9999px;";
     document.body.appendChild(mount);
-    new QRCode(mount,{text:value,width:size,height:size,colorDark:"#00ff9f",colorLight:"#000000",correctLevel:QRCode.CorrectLevel.H});
+    const qrInstance=new QRCode(mount,{
+      text,
+      width:outSize,
+      height:outSize,
+      colorDark:"#000000",
+      colorLight:"#FFFFFF",
+      correctLevel:QRCode.CorrectLevel[QR_ERROR_CORRECTION_LEVEL]
+    });
     // Use canvas element directly (always available), fall back to img src
     setTimeout(()=>{
       const canvas=mount.querySelector("canvas");
       const img=mount.querySelector("img");
       document.body.removeChild(mount);
       const drawFinal=(qrDataUrl)=>{
-        if(!logoSrc){resolve(qrDataUrl);return;}
         const finalCanvas=document.createElement("canvas");
-        finalCanvas.width=size;finalCanvas.height=size;
+        finalCanvas.width=outSize;finalCanvas.height=outSize;
         const ctx=finalCanvas.getContext("2d");
         const qrImg=new Image();
         qrImg.onload=()=>{
-          ctx.drawImage(qrImg,0,0,size,size);
+          const moduleCount=qrInstance?._oQRCode?.getModuleCount?.()||0;
+          const modulePx=moduleCount?outSize/moduleCount:0;
+          const quietZonePx=Math.max(8,Math.round(modulePx*QR_MARGIN_MODULES));
+          const qrDrawSize=Math.max(1,outSize-(quietZonePx*2));
+          ctx.imageSmoothingEnabled=false;
+          ctx.fillStyle="#FFFFFF";
+          ctx.fillRect(0,0,outSize,outSize);
+          ctx.drawImage(qrImg,quietZonePx,quietZonePx,qrDrawSize,qrDrawSize);
+          if(!logoSrc){resolve(finalCanvas.toDataURL("image/png"));return;}
           const logo=new Image();
           logo.onload=()=>{
-            const lSize=Math.round(size*0.22);
-            const p=Math.max(4,Math.round(size*0.02));
-            const x=Math.round((size-lSize)/2);
-            const y=Math.round((size-lSize)/2);
-            ctx.fillStyle="#ffffff";
-            ctx.fillRect(x-p,y-p,lSize+p*2,lSize+p*2);
+            const lSize=Math.round(outSize*QR_LOGO_RATIO);
+            const x=Math.round((outSize-lSize)/2);
+            const y=Math.round((outSize-lSize)/2);
+            // White patch keeps center modules from bleeding into the logo.
+            ctx.fillStyle="#FFFFFF";
+            ctx.fillRect(x,y,lSize,lSize);
             ctx.drawImage(logo,x,y,lSize,lSize);
             resolve(finalCanvas.toDataURL("image/png"));
           };
@@ -885,6 +907,7 @@ function QRScanner({onScan,onClose}){
   const vRef=useRef();
   const canvasRef=useRef();
   const rafRef=useRef();
+  const lastDecodeAtRef=useRef(0);
   const streamRef=useRef(null);
   const [camErr,setCamErr]=useState(null);
   const [manual,setManual]=useState("");
@@ -920,17 +943,35 @@ function QRScanner({onScan,onClose}){
     const tick=()=>{
       const v=vRef.current;const c=canvasRef.current;
       if(v&&c&&v.readyState===v.HAVE_ENOUGH_DATA){
+        const now=Date.now();
+        if(now-lastDecodeAtRef.current<100){
+          rafRef.current=requestAnimationFrame(tick);
+          return;
+        }
+        lastDecodeAtRef.current=now;
         c.width=v.videoWidth;c.height=v.videoHeight;
         const ctx=c.getContext("2d");
         ctx.drawImage(v,0,0,c.width,c.height);
         if(typeof jsQR!=="undefined"){
-          const imgData=ctx.getImageData(0,0,c.width,c.height);
-          const code=jsQR(imgData.data,imgData.width,imgData.height,{inversionAttempts:"attemptBoth"});
+          const box=Math.min(c.width,c.height,300);
+          const sx=Math.floor((c.width-box)/2);
+          const sy=Math.floor((c.height-box)/2);
+          const centerData=ctx.getImageData(sx,sy,box,box);
+          let code=jsQR(centerData.data,centerData.width,centerData.height,{inversionAttempts:"attemptBoth"});
+          if(!(code&&code.data)){
+            const imgData=ctx.getImageData(0,0,c.width,c.height);
+            code=jsQR(imgData.data,imgData.width,imgData.height,{inversionAttempts:"attemptBoth"});
+          }
           if(code&&code.data){
-            setDetected(code.data);
+            const normalizedCode=normalizeInputCode(code.data);
+            if(!normalizedCode){
+              rafRef.current=requestAnimationFrame(tick);
+              return;
+            }
+            setDetected(normalizedCode);
             setScanning(false);
             stopStream();
-            setTimeout(()=>onScan(normalizeInputCode(code.data)),500);
+            setTimeout(()=>onScan(normalizedCode),500);
             return;
           }
         }
@@ -965,7 +1006,7 @@ function QRScanner({onScan,onClose}){
       <div style={{marginTop:16}}>
         <span style={S.lbl}>MANUAL QR CODE ENTRY:</span>
         <div style={{display:"flex",gap:8}}>
-          <input style={S.input} value={manual} onChange={e=>setManual(e.target.value)} placeholder="QR VALUE OR VALIDATION CODE" onKeyDown={e=>{if(e.key==="Enter"){const normalized=normalizeInputCode(manual);if(normalized)onScan(normalized);}}}/>
+          <input style={S.input} value={manual} onChange={e=>setManual(e.target.value)} placeholder="VALIDATION CODE" onKeyDown={e=>{if(e.key==="Enter"){const normalized=normalizeInputCode(manual);if(normalized)onScan(normalized);}}}/>
           <button style={{...S.btn,flexShrink:0}} onClick={()=>{const normalized=normalizeInputCode(manual);if(normalized)onScan(normalized);}}>SUBMIT</button>
         </div>
       </div>
@@ -1939,21 +1980,21 @@ function CluesPage(){
     try{
       requireAdmin();
       if(editingId){
-        // Generate QR for updated clue — payload uses id|CODE so we need to get the id
+        // Generate QR for updated clue using normalized validation code payload.
         const existingClue=clues.find(c=>c.id===editingId);
         let qrImage="";
         if(existingClue){
-          const updatedPayload=`${existingClue.id}|${form.validationCode.trim().toUpperCase()}`;
-          qrImage=await generateQRDataUrl(updatedPayload,240,"photos/logo.png")||"";
+          const updatedPayload=normalizeQrPayload(form.validationCode);
+          qrImage=await generateQRDataUrl(updatedPayload,QR_PRINT_SIZE,"photos/logo.png")||"";
         }
         await api(`/api/clue/${editingId}`,"PUT",{title:form.title,description:form.description,validationCode:form.validationCode,hint:form.hint,difficulty:form.difficulty,qrImage});
         flash("CLUE UPDATED");
       }else{
-        // Create clue first to get the id, then generate QR with id|CODE payload
+        // Create clue first, then persist high-res QR for its validation code payload.
         const created=await api("/api/clue","POST",{title:form.title,description:form.description,validationCode:form.validationCode,hint:form.hint,difficulty:form.difficulty,qrImage:""});
         if(created?.clue?.id){
-          const payload=created.clue.qrPayload||`${created.clue.id}|${form.validationCode.trim().toUpperCase()}`;
-          const qrImage=await generateQRDataUrl(payload,240,"photos/logo.png")||"";
+          const payload=normalizeQrPayload(created.clue.qrPayload||form.validationCode);
+          const qrImage=await generateQRDataUrl(payload,QR_PRINT_SIZE,"photos/logo.png")||"";
           if(qrImage)await api(`/api/clue/${created.clue.id}`,"PUT",{qrImage});
         }
         flash("CLUE ADDED");
@@ -1992,7 +2033,7 @@ function CluesPage(){
   const downloadQR=async(clue)=>{
     const payload=payloadFor(clue);
     // Use stored image from DB if available, else generate on the fly
-    const src=clue.qrImage&&clue.qrImage.startsWith("data:")?clue.qrImage:await generateQRDataUrl(payload,240,"photos/logo.png");
+    const src=clue.qrImage&&clue.qrImage.startsWith("data:")?clue.qrImage:await generateQRDataUrl(payload,QR_PRINT_SIZE,"photos/logo.png");
     if(!src)return;
     saveDataUrl(src,qrFileName(payload));
   };
@@ -2107,7 +2148,7 @@ function QRCodes(){
 
       const files=[];
       for(const item of entries){
-        const src=await generateQRDataUrl(item.payload,240,"photos/logo.png");
+        const src=await generateQRDataUrl(item.payload,QR_PRINT_SIZE,"photos/logo.png");
         if(!src)continue;
         const data=await dataUrlToBytes(src);
         files.push({name:item.filename,data});
@@ -2130,7 +2171,7 @@ function QRCodes(){
           {teams.map(u=><button key={u.id} style={{...S.btn,...(selTeam===u.id?{background:"#00ff9f1a",borderColor:"#00ff9f"}:{})}} onClick={()=>setSelTeam(u.id)}>{u.team_name}</button>)}
         </div>
         <div style={{fontSize:10,color:"#00ff9f44",fontFamily:"'Share Tech Mono'",marginBottom:8}}>
-          QR SPECS: HIGH error correction Â· Black bg Â· Neon green modules Â· Sponsor logo embedded (22% width)
+          QR SPECS: H error correction · margin 4 · 500px PNG · center logo 18%
         </div>
         <button style={{...S.btn,marginTop:8}} onClick={downloadAll} disabled={!teams.length||downloadingAll}>
           {downloadingAll?"BUILDING ZIP...":"DOWNLOAD ALL QR (ALL TEAMS)"}
@@ -2159,7 +2200,7 @@ function QRCard({clue,index,onDownload}){
       if(clue.qrImage&&clue.qrImage.startsWith("data:")){
         if(active)setQrSrc(clue.qrImage);
       }else{
-        const src=await generateQRDataUrl(value,200,"photos/logo.png");
+        const src=await generateQRDataUrl(value,QR_PRINT_SIZE,"photos/logo.png");
         if(active)setQrSrc(src);
       }
     })();
