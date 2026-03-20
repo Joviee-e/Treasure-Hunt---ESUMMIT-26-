@@ -3,8 +3,8 @@
 module.exports = {
   // ── Timer durations (milliseconds) ───────────────────────────────────────────
   // Change these to adjust game times without touching any other file
-  TREASURE_DURATION_MS : 45 * 60 * 1000,   // 45 minutes
-  ESCAPE_DURATION_MS   : 30 * 60 * 1000,   // 30 minutes
+  TREASURE_DURATION_MS : 55 * 60 * 1000,   // 55 minutes
+  ESCAPE_DURATION_MS   : 5 * 60 * 1000,    // 5 minutes
 
   // ── Security ──────────────────────────────────────────────────────────────────
   SALT_ROUNDS : 10,

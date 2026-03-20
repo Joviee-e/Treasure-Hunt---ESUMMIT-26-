@@ -12,6 +12,10 @@ const { Progress } = require("../models/Legacy");
 const { toUiTeam }               = require("../utils/serialize");
 const { checkAndFailIfExpired, failTeam } = require("../utils/timer");
 
+function timerActiveForState(state) {
+  return state === "TREASURE_HUNT" || state === "ESCAPE_ACTIVE";
+}
+
 // ─────────────────────────────────────────────────────────────────────────────
 // GET /api/queue-status
 // ─────────────────────────────────────────────────────────────────────────────
@@ -30,7 +34,8 @@ router.get("/queue-status", async (_req, res) => {
         queue_position: e.queue_position,
         started_at    : e.started_at || null,
         ended_at      : e.ended_at   || null,
-      })),
+        is_timer_active: timerActiveForState(teamMap[String(e.team_id)]?.game_state || "NOT_STARTED"),
+      })), 
     });
   } catch (err) {
     console.error("[queue-status]", err);
@@ -275,10 +280,10 @@ router.post("/escape-queue", async (req, res) => {
       } else if (canonical === "escape_completed") {
         team.game_state            = "COMPLETED";
         team.is_active             = false;
-        team.escape_end_time       = team.escape_end_time || now;
-        team.final_submission_time = team.final_submission_time || now;
+        team.escape_end_time       = now;
+        team.final_submission_time = now;
         progress.escapeStatus      = "finished";
-        if (!progress.escapeFinishedAt) progress.escapeFinishedAt = now;
+        progress.escapeFinishedAt  = now;
       } else {
         // queued / waiting
         team.escape_room_started  = false;
@@ -305,7 +310,7 @@ router.post("/escape-queue", async (req, res) => {
     }
 
     await Promise.all([team.save(), progress.save()]);
-    res.json({ ok: true });
+    res.json({ ok: true, is_timer_active: timerActiveForState(team.game_state), user: toUiTeam(team) });
   } catch (err) {
     console.error("[escape-queue legacy]", err);
     res.status(500).json({ error: "Internal server error" });
@@ -313,3 +318,5 @@ router.post("/escape-queue", async (req, res) => {
 });
 
 module.exports = router;
+
+

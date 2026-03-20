@@ -3,21 +3,25 @@
  * Admin / operator routes: clue CRUD, vault, assignment, leaderboard, QR
  */
 const express = require("express");
-const router  = express.Router();
+const router = express.Router();
 
-const Team    = require("../models/Team");
-const Clue    = require("../models/Clue");
+const Team = require("../models/Team");
+const Clue = require("../models/Clue");
 const { Assignment } = require("../models/Legacy");
-const { toClueJson, toUiTeam } = require("../utils/serialize");
-const { failTeam }             = require("../utils/timer");
+const { toClueJson, toUiTeam, normalizeAnswer } = require("../utils/serialize");
+const { failTeam } = require("../utils/timer");
+const { TREASURE_DURATION_MS, ESCAPE_DURATION_MS } = require("../utils/config");
 
-// qrPayload helper — must match what frontend expects
-const cluePayload = (clue) =>
-  `${String(clue._id)}|${String(clue.validationCode || "").toUpperCase()}`;
+const CLUE_POINTS = 100;
+const ESCAPE_COMPLETION_BONUS = 500;
 
-// ─────────────────────────────────────────────────────────────────────────────
-// CLUE CRUD
-// ─────────────────────────────────────────────────────────────────────────────
+function formatTime(ms) {
+  if (!ms) return "-";
+  const totalSeconds = Math.max(0, Math.floor(ms / 1000));
+  const mins = String(Math.floor(totalSeconds / 60)).padStart(2, "0");
+  const secs = String(totalSeconds % 60).padStart(2, "0");
+  return `${mins}:${secs}`;
+}
 
 router.get("/clues", async (_req, res) => {
   try {
@@ -29,26 +33,24 @@ router.get("/clues", async (_req, res) => {
   }
 });
 
-// POST /api/clue — create clue
 router.post("/clue", async (req, res) => {
   try {
     const { title, description, validationCode, hint, difficulty, qrImage } = req.body || {};
     if (!title || !description || !validationCode)
       return res.status(400).json({ error: "title, description, validationCode required" });
 
+    const normalizedCode = normalizeAnswer(validationCode);
     const clue = await Clue.create({
       title,
       description,
-      validationCode: String(validationCode).toUpperCase().trim(),
-      hint          : hint       || "",
-      difficulty    : difficulty || "",
-      qrPayload     : "",
-      qrImage       : qrImage || "",
+      validationCode: normalizedCode,
+      hint: hint || "",
+      difficulty: difficulty || "",
+      qrPayload: normalizedCode,
+      qrImage: qrImage || "",
     });
-    clue.qrPayload = cluePayload(clue);
-    await clue.save();
 
-    console.log(`  ↳ Clue CREATED: "${title}"`);
+    console.log(`  -> Clue CREATED: "${title}"`);
     res.json({ clue: toClueJson(clue) });
   } catch (err) {
     console.error("[clue POST]", err);
@@ -56,18 +58,23 @@ router.post("/clue", async (req, res) => {
   }
 });
 
-// PUT /api/clue/:id — update clue
 router.put("/clue/:id", async (req, res) => {
   try {
     const { id } = req.params;
     const updates = { ...req.body };
-    if (updates.validationCode)
-      updates.validationCode = String(updates.validationCode).toUpperCase().trim();
+    if (updates.validationCode !== undefined) {
+      updates.validationCode = normalizeAnswer(updates.validationCode);
+      updates.qrPayload = updates.validationCode;
+    }
 
     const clue = await Clue.findByIdAndUpdate(id, updates, { new: true });
     if (!clue) return res.status(404).json({ error: "Clue not found" });
-    clue.qrPayload = cluePayload(clue);
-    await clue.save();
+
+    if (updates.validationCode === undefined && clue.qrPayload !== normalizeAnswer(clue.validationCode)) {
+      clue.qrPayload = normalizeAnswer(clue.validationCode);
+      await clue.save();
+    }
+
     res.json({ clue: toClueJson(clue) });
   } catch (err) {
     console.error("[clue PUT]", err);
@@ -75,7 +82,6 @@ router.put("/clue/:id", async (req, res) => {
   }
 });
 
-// DELETE /api/clue/:id
 router.delete("/clue/:id", async (req, res) => {
   try {
     const { id } = req.params;
@@ -88,10 +94,6 @@ router.delete("/clue/:id", async (req, res) => {
     res.status(500).json({ error: "Internal server error" });
   }
 });
-
-// ─────────────────────────────────────────────────────────────────────────────
-// VAULT CODE
-// ─────────────────────────────────────────────────────────────────────────────
 
 router.get("/vault-code", async (_req, res) => {
   try {
@@ -108,13 +110,15 @@ router.put("/vault-code", async (req, res) => {
   try {
     const { code } = req.body || {};
     if (!code) return res.status(400).json({ error: "code required" });
-    const upper = String(code).toUpperCase().trim();
+
+    const upper = normalizeAnswer(code);
     const v = await Clue.findOneAndUpdate(
       { title: "__VAULT__" },
       { $set: { validationCode: upper } },
       { new: true, upsert: true, setDefaultsOnInsert: true }
     );
-    console.log(`  ↳ VAULT CODE UPDATED: ${upper}`);
+
+    console.log(`  -> VAULT CODE UPDATED: ${upper}`);
     res.json({ code: v.validationCode });
   } catch (err) {
     console.error("[vault-code PUT]", err);
@@ -122,11 +126,6 @@ router.put("/vault-code", async (req, res) => {
   }
 });
 
-// ─────────────────────────────────────────────────────────────────────────────
-// CLUE ASSIGNMENT
-// ─────────────────────────────────────────────────────────────────────────────
-
-// GET /api/assignment/:teamId
 router.get("/assignment/:teamId", async (req, res) => {
   try {
     const { teamId } = req.params;
@@ -135,7 +134,11 @@ router.get("/assignment/:teamId", async (req, res) => {
       assignment = await Assignment.create({ teamId, clues: [] });
       await assignment.populate("clues");
     }
-    const clues = (assignment.clues || []).filter(c => c.title !== "__VAULT__").map(toClueJson);
+
+    const clues = (assignment.clues || [])
+      .filter((c) => c.title !== "__VAULT__")
+      .map(toClueJson);
+
     res.json({ teamId, clues });
   } catch (err) {
     console.error("[assignment GET]", err);
@@ -143,7 +146,6 @@ router.get("/assignment/:teamId", async (req, res) => {
   }
 });
 
-// POST /api/assign — add a clue to a team
 router.post("/assign", async (req, res) => {
   try {
     const { teamId, clueId } = req.body || {};
@@ -154,13 +156,10 @@ router.post("/assign", async (req, res) => {
     if (!clue) return res.status(404).json({ error: "Clue not found" });
 
     await Promise.all([
-      Assignment.findOneAndUpdate(
-        { teamId },
-        { $addToSet: { clues: clueId } },
-        { upsert: true }
-      ),
+      Assignment.findOneAndUpdate({ teamId }, { $addToSet: { clues: clueId } }, { upsert: true }),
       Team.findByIdAndUpdate(teamId, { $addToSet: { assigned_clues: clueId } }),
     ]);
+
     res.json({ ok: true });
   } catch (err) {
     console.error("[assign POST]", err);
@@ -168,7 +167,6 @@ router.post("/assign", async (req, res) => {
   }
 });
 
-// POST /api/remove-clue — remove a clue from a team
 router.post("/remove-clue", async (req, res) => {
   try {
     const { teamId, clueId } = req.body || {};
@@ -179,6 +177,7 @@ router.post("/remove-clue", async (req, res) => {
       Assignment.findOneAndUpdate({ teamId }, { $pull: { clues: clueId } }),
       Team.findByIdAndUpdate(teamId, { $pull: { assigned_clues: clueId } }),
     ]);
+
     res.json({ ok: true });
   } catch (err) {
     console.error("[remove-clue POST]", err);
@@ -186,7 +185,6 @@ router.post("/remove-clue", async (req, res) => {
   }
 });
 
-// POST /api/reorder-clues — set clue order for a team
 router.post("/reorder-clues", async (req, res) => {
   try {
     const { teamId, orderedClueIds } = req.body || {};
@@ -196,19 +194,22 @@ router.post("/reorder-clues", async (req, res) => {
     const assignment = await Assignment.findOne({ teamId });
     if (!assignment) return res.status(404).json({ error: "Assignment not found" });
 
-    const currentIds = (assignment.clues || []).map(id => String(id));
-    const nextIds    = orderedClueIds.map(id => String(id));
+    const currentIds = (assignment.clues || []).map((id) => String(id));
+    const nextIds = orderedClueIds.map((id) => String(id));
     const uniqueNext = new Set(nextIds);
 
     if (
       nextIds.length !== currentIds.length ||
-      uniqueNext.size !== nextIds.length   ||
-      currentIds.some(id => !uniqueNext.has(id))
-    ) return res.status(400).json({ error: "orderedClueIds must contain the same assigned clues exactly once" });
+      uniqueNext.size !== nextIds.length ||
+      currentIds.some((id) => !uniqueNext.has(id))
+    ) {
+      return res.status(400).json({ error: "orderedClueIds must contain the same assigned clues exactly once" });
+    }
 
     assignment.clues = nextIds;
     await assignment.save();
     await Team.findByIdAndUpdate(teamId, { $set: { assigned_clues: nextIds } });
+
     res.json({ ok: true });
   } catch (err) {
     console.error("[reorder-clues POST]", err);
@@ -216,67 +217,154 @@ router.post("/reorder-clues", async (req, res) => {
   }
 });
 
-// ─────────────────────────────────────────────────────────────────────────────
-// LEADERBOARD
-// ─────────────────────────────────────────────────────────────────────────────
+// Monitor payload for admin panel.
+router.get("/admin/monitor", async (_req, res) => {
+  try {
+    const teams = await Team.find({ role: { $ne: "operator" } }).sort({ createdAt: 1 });
+    res.json({ teams: teams.map((t) => toUiTeam(t)) });
+  } catch (err) {
+    console.error("[admin-monitor]", err);
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
 
 router.get("/leaderboard", async (_req, res) => {
   try {
-    const teams = await Team.find({ role: { $ne: "operator" } }).lean();
+    // Always fetch fresh data and disable any client/proxy caching.
+    res.set("Cache-Control", "no-store, no-cache, must-revalidate, proxy-revalidate");
+    res.set("Pragma", "no-cache");
+    res.set("Expires", "0");
 
-    const entries = teams.map(t => {
-      const tMs =
-        t.treasure_start_time && t.treasure_end_time
-          ? new Date(t.treasure_end_time).getTime() - new Date(t.treasure_start_time).getTime()
-          : null;
-      const eMs =
-        t.escape_start_time && t.escape_end_time
-          ? new Date(t.escape_end_time).getTime() - new Date(t.escape_start_time).getTime()
-          : null;
-      const totalMs = tMs !== null && eMs !== null ? tMs + eMs : null;
+    const teams = await Team.find({ role: { $ne: "operator" } });
+    const allClues = await Clue.find({ title: { $ne: "__VAULT__" } })
+      .sort({ order_index: 1, createdAt: 1 })
+      .select({ _id: 1 });
+    const fallbackAssigned = allClues.map((c) => c._id);
+    const maxTotalSeconds = Math.floor((TREASURE_DURATION_MS + ESCAPE_DURATION_MS) / 1000);
 
-      return {
-        id                  : String(t._id),
-        team_name           : t.name,
-        game_state          : t.game_state || "NOT_STARTED",
-        failure_reason      : t.failure_reason || null,
-        completed_clues     : (t.completed_clues || []).length,
-        total_clues         : t.total_clues || 0,
-        treasure_time_ms    : tMs,
-        escape_time_ms      : eMs,
-        total_time_ms       : totalMs,
-        final_submission_time: t.final_submission_time || null,
-      };
-    });
+    const entries = [];
+    for (const team of teams) {
+      let dirty = false;
+
+      if (!Array.isArray(team.assigned_clues)) {
+        team.assigned_clues = [];
+        dirty = true;
+      }
+      if (!Array.isArray(team.completed_clues)) {
+        team.completed_clues = [];
+        dirty = true;
+      }
+      if (team.assigned_clues.length === 0 && fallbackAssigned.length > 0) {
+        team.assigned_clues = fallbackAssigned;
+        dirty = true;
+      }
+      if (team.game_state === "COMPLETED") {
+        const now = new Date();
+        if (!team.treasure_start_time && team.treasure_end_time) {
+          team.treasure_start_time = team.treasure_end_time;
+          dirty = true;
+        }
+        if (!team.escape_start_time && team.escape_end_time) {
+          team.escape_start_time = team.escape_end_time;
+          dirty = true;
+        }
+        if (!team.treasure_end_time) {
+          team.treasure_end_time = now;
+          if (!team.treasure_start_time) team.treasure_start_time = now;
+          dirty = true;
+        }
+        if (!team.escape_end_time) {
+          team.escape_end_time = now;
+          if (!team.escape_start_time) team.escape_start_time = now;
+          dirty = true;
+        }
+      }
+
+      const totalClues = team.assigned_clues.length || 0;
+      const cluesCompleted = team.completed_clues.length || 0;
+      if (team.total_clues !== totalClues) {
+        team.total_clues = totalClues;
+        dirty = true;
+      }
+      if (dirty) await team.save();
+
+      const huntMs =
+        team.treasure_start_time && team.treasure_end_time
+          ? Math.max(0, new Date(team.treasure_end_time).getTime() - new Date(team.treasure_start_time).getTime())
+          : null;
+      const escapeMs =
+        team.escape_start_time && team.escape_end_time
+          ? Math.max(0, new Date(team.escape_end_time).getTime() - new Date(team.escape_start_time).getTime())
+          : null;
+      const totalMs = huntMs !== null && escapeMs !== null ? huntMs + escapeMs : null;
+
+      const state = team.game_state || "NOT_STARTED";
+      const escapeStatus = state === "COMPLETED" ? "ESCAPED" : state === "FAILED" ? "FAILED" : "-";
+
+      const totalSeconds = totalMs !== null ? Math.floor(totalMs / 1000) : null;
+      const timeBonus = state === "COMPLETED" && totalSeconds !== null
+        ? Math.max(0, Math.floor((maxTotalSeconds - totalSeconds) / 10))
+        : 0;
+
+      const score =
+        cluesCompleted * CLUE_POINTS +
+        (state === "COMPLETED" ? ESCAPE_COMPLETION_BONUS : 0) +
+        timeBonus;
+
+      entries.push({
+        team_name: team.name || "-",
+        clues_completed: cluesCompleted,
+        total_clues: totalClues,
+        hunt_time: formatTime(huntMs),
+        escape_time: formatTime(escapeMs),
+        total_time: formatTime(totalMs),
+        state,
+        escape_status: escapeStatus,
+        score,
+
+        _sortState: state,
+        _sortTotalMs: totalMs,
+      });
+    }
 
     entries.sort((a, b) => {
-      const rank = s => s === "COMPLETED" ? 0 : s === "FAILED" ? 2 : 1;
-      const ra = rank(a.game_state), rb = rank(b.game_state);
+      const rank = (s) => (s === "COMPLETED" ? 0 : s === "FAILED" ? 2 : 1);
+      const ra = rank(a._sortState);
+      const rb = rank(b._sortState);
       if (ra !== rb) return ra - rb;
-      if (a.game_state === "COMPLETED")
-        return (a.total_time_ms ?? Infinity) - (b.total_time_ms ?? Infinity);
-      if (a.game_state === "FAILED")
-        return b.completed_clues - a.completed_clues;
-      return 0;
+
+      if (a._sortState === "COMPLETED") {
+        return (a._sortTotalMs ?? Number.MAX_SAFE_INTEGER) - (b._sortTotalMs ?? Number.MAX_SAFE_INTEGER);
+      }
+
+      if (a.score !== b.score) return b.score - a.score;
+      return b.clues_completed - a.clues_completed;
     });
 
-    res.json({ leaderboard: entries });
+    res.json({
+      leaderboard: entries.map(({ _sortState, _sortTotalMs, ...row }) => row),
+    });
   } catch (err) {
     console.error("[leaderboard]", err);
     res.status(500).json({ error: "Internal server error" });
   }
 });
 
-// ─────────────────────────────────────────────────────────────────────────────
-// QR helpers
-// ─────────────────────────────────────────────────────────────────────────────
-
 router.get("/generate-qr", async (req, res) => {
   try {
     const { clueId } = req.query;
     if (!clueId) return res.status(400).json({ error: "clueId required" });
+
     const clue = await Clue.findById(clueId);
     if (!clue) return res.status(404).json({ error: "Clue not found" });
+
+    // Keep persisted payload clean and consistent with validation code.
+    const normalizedCode = normalizeAnswer(clue.validationCode);
+    if (clue.qrPayload !== normalizedCode) {
+      clue.qrPayload = normalizedCode;
+      await clue.save();
+    }
+
     res.json({ clue: toClueJson(clue) });
   } catch (err) {
     console.error("[generate-qr]", err);
@@ -287,16 +375,23 @@ router.get("/generate-qr", async (req, res) => {
 router.get("/download-all-qr", async (_req, res) => {
   try {
     const clues = await Clue.find({ title: { $ne: "__VAULT__" } }).sort({ createdAt: 1 });
-    res.json({ clues: clues.map(toClueJson) });
+    const normalizedClues = [];
+
+    for (const clue of clues) {
+      const normalizedCode = normalizeAnswer(clue.validationCode);
+      if (clue.qrPayload !== normalizedCode) {
+        clue.qrPayload = normalizedCode;
+        await clue.save();
+      }
+      normalizedClues.push(clue);
+    }
+
+    res.json({ clues: normalizedClues.map(toClueJson) });
   } catch (err) {
     console.error("[download-all-qr]", err);
     res.status(500).json({ error: "Internal server error" });
   }
 });
-
-// ─────────────────────────────────────────────────────────────────────────────
-// OPERATOR FORCE END
-// ─────────────────────────────────────────────────────────────────────────────
 
 router.post("/operator-end-team", async (req, res) => {
   try {
@@ -310,13 +405,13 @@ router.post("/operator-end-team", async (req, res) => {
       const now = new Date();
       await Team.findByIdAndUpdate(teamId, {
         $set: {
-          game_state            : "COMPLETED",
-          is_active             : false,
-          escape_end_time       : now,
-          final_submission_time : now,
-          escape_room_completed : true,
-          escape_room_started   : true,
-          status                : "escape_completed",
+          game_state: "COMPLETED",
+          is_active: false,
+          escape_end_time: now,
+          final_submission_time: now,
+          escape_room_completed: true,
+          escape_room_started: true,
+          status: "escape_completed",
         },
       });
     } else {
@@ -324,7 +419,7 @@ router.post("/operator-end-team", async (req, res) => {
     }
 
     const fresh = await Team.findById(teamId);
-    console.log(`  ↳ OPERATOR FORCE END: ${team.name} → ${outcome || "FAILED"}`);
+    console.log(`  -> OPERATOR FORCE END: ${team.name} -> ${outcome || "FAILED"}`);
     res.json({ ok: true, user: toUiTeam(fresh) });
   } catch (err) {
     console.error("[operator-end-team]", err);

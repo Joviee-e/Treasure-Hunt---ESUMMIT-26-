@@ -245,10 +245,9 @@ async function handleValidate(req, res) {
     if (!clue) return res.json({ valid: false, reason: "CLUE_NOT_FOUND" });
 
     // ── Validate code ─────────────────────────────────────────────────────────
-    const entered         = String(code).trim().toUpperCase();
-    const expectedCode    = String(clue.validationCode || "").toUpperCase();
-    const expectedPayload = `${String(clue._id)}|${expectedCode}`;
-    const valid           = entered === expectedCode || entered === expectedPayload;
+    const entered      = String(code).trim().toUpperCase();
+    const expectedCode = String(clue.validationCode || "").trim().toUpperCase();
+    const valid        = entered === expectedCode;
 
     if (!valid) return res.json({ valid: false });
 
