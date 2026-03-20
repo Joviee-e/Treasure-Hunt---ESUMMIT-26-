@@ -236,6 +236,8 @@ router.get("/leaderboard", async (_req, res) => {
     res.set("Pragma", "no-cache");
     res.set("Expires", "0");
 
+    const docs = await Team.find({ role: { $ne: "operator" } });
+    for (const t of docs) await checkAndFailIfExpired(t);
     const teams = await Team.find({ role: { $ne: "operator" } });
     const allClues = await Clue.find({ title: { $ne: "__VAULT__" } })
       .sort({ order_index: 1, createdAt: 1 })

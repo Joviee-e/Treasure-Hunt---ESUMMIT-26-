@@ -19,7 +19,11 @@ function toUiTeam(team) {
   const completedCluesCount = Array.isArray(team.completed_clues)
     ? team.completed_clues.length
     : 0;
-  const isTimerActive = gameState === "TREASURE_HUNT" || gameState === "ESCAPE_ACTIVE";
+  const treasureRemainingMs = gameState === "TREASURE_HUNT" ? treasureRemaining(team) : null;
+  const escapeRemainingMs = gameState === "ESCAPE_ACTIVE" ? escapeRemaining(team) : null;
+  const hasActiveTimer = gameState === "TREASURE_HUNT" || gameState === "ESCAPE_ACTIVE";
+  const remainingMs = gameState === "TREASURE_HUNT" ? treasureRemainingMs : escapeRemainingMs;
+  const isTimerActive = hasActiveTimer && remainingMs !== null && remainingMs > 0;
 
   return {
     id                     : String(team._id),
@@ -44,8 +48,8 @@ function toUiTeam(team) {
     total_clues            : assignedCluesCount,
     vault_code             : team.vault_code || null,
 
-    treasure_remaining_ms  : gameState === "TREASURE_HUNT" ? treasureRemaining(team) : null,
-    escape_remaining_ms    : gameState === "ESCAPE_ACTIVE" ? escapeRemaining(team) : null,
+    treasure_remaining_ms  : gameState === "TREASURE_HUNT" && isTimerActive ? treasureRemainingMs : null,
+    escape_remaining_ms    : gameState === "ESCAPE_ACTIVE" && isTimerActive ? escapeRemainingMs : null,
     treasure_total_ms      : TREASURE_DURATION_MS,
     escape_total_ms        : ESCAPE_DURATION_MS,
   };

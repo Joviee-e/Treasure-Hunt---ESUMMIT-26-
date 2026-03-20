@@ -1001,10 +1001,10 @@ function ClueScreen({user,onLogout}){
   const runtime=()=>db.getTeam(user.id)||null;
 
   // ── Helper: derive start time from server remaining_ms ───────
-  const huntStartFromRemaining=(remMs)=>{
-    if(remMs==null)return null;
-    return Date.now()-(45*60*1000-remMs);
-  };
+const huntStartFromRemaining=(remMs)=>{
+  if(remMs==null)return null;
+  return Date.now()-(55*60*1000-remMs);
+};
   const escStartFromRemaining=(remMs)=>{
     if(remMs==null)return null;
     return Date.now()-(30*60*1000-remMs);
@@ -1305,7 +1305,7 @@ function ClueScreen({user,onLogout}){
         {huntStarted&&effectiveHuntStart&&!p.hunt_finish_time&&(
           <Timer
             startTime={effectiveHuntStart}
-            duration={45*60}
+            duration={55*60}
             label="HUNT TIMER"
             onExpire={()=>{
               // Don't set gameover locally; let polling confirm from server.
@@ -1618,7 +1618,7 @@ function Queue(){
     <div>
       <div style={{...S.hdr,marginBottom:16}}>[ ESCAPE ROOM QUEUE CONTROL ]</div>
       {queue.length===0&&<div style={{...S.panel,fontFamily:"'Share Tech Mono'",color:"#00ff9f33",padding:18,textAlign:"center"}}>NO TEAMS IN QUEUE â€” AWAITING OPERATIVES</div>}
-      {queue.map((entry,i)=>{
+      {queue.filter(e => e.status === "waiting" || e.status === "active").map((entry,i)=>{
         const nm=db.getTeamName(entry.team_id);
         const active=entry.status==="active",done=entry.status==="finished";
         return(
@@ -1635,7 +1635,14 @@ function Queue(){
               </div>
             </div>
             {(active||done)&&<>
-              {entry.escape_start_time&&entry.is_timer_active!==false&&<Timer startTime={entry.escape_start_time} duration={5*60} label="ESCAPE TIMER" onExpire={()=>{}}/>}
+              {entry.status === "active" && entry.is_timer_active !== false && entry.escape_start_time && (
+                <Timer
+                  startTime={entry.escape_start_time}
+                  duration={5*60}
+                  label="ESCAPE TIMER"
+                  onExpire={()=>{}}
+                />
+              )}
               {PUZZLES.map((pp,pi)=>{const solved=(entry.puzzles_solved||[]).includes(pi);return(
                 <div key={pi} style={{display:"flex",alignItems:"center",gap:8,padding:"5px 0"}}>
                   <button style={{...S.btn,fontSize:10,padding:"2px 7px",borderColor:solved?"#00ff9f":"#00ff9f33"}} onClick={()=>toggleP(entry.team_id,pi)}>{solved?"âœ“":"â—‹"}</button>

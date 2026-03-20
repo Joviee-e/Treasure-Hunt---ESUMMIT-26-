@@ -43,9 +43,10 @@ async function checkAndFailIfExpired(team) {
   const now = new Date();
   team.game_state = "FAILED";
   team.is_active = false;
-  team.failure_reason = "TIME_EXPIRED";
+  team.failure_reason = escapeExpired ? "TIME_EXPIRED" : "TREASURE_TIMEOUT";
   team.status = "queued";
   if (escapeExpired) team.escape_end_time = now;
+  if (!escapeExpired) team.treasure_end_time = now;
 
   await team.save();
   await EscapeQueue.deleteOne({ team_id: team._id });
