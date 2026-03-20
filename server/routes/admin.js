@@ -9,7 +9,7 @@ const Team = require("../models/Team");
 const Clue = require("../models/Clue");
 const { Assignment } = require("../models/Legacy");
 const { toClueJson, toUiTeam, normalizeAnswer } = require("../utils/serialize");
-const { failTeam } = require("../utils/timer");
+const { failTeam, checkAndFailIfExpired } = require("../utils/timer");
 
 const CLUE_POINTS = 100;
 const ESCAPE_COMPLETION_BONUS = 500;
@@ -219,6 +219,8 @@ router.post("/reorder-clues", async (req, res) => {
 // Monitor payload for admin panel.
 router.get("/admin/monitor", async (_req, res) => {
   try {
+    const docs = await Team.find({ role: { $ne: "operator" } }).sort({ createdAt: 1 });
+    for (const t of docs) await checkAndFailIfExpired(t);
     const teams = await Team.find({ role: { $ne: "operator" } }).sort({ createdAt: 1 });
     res.json({ teams: teams.map((t) => toUiTeam(t)) });
   } catch (err) {
@@ -297,7 +299,7 @@ router.get("/leaderboard", async (_req, res) => {
       const totalMs = huntMs !== null && escapeMs !== null ? huntMs + escapeMs : null;
 
       const state = team.game_state || "NOT_STARTED";
-      const escapeStatus = state === "COMPLETED" ? "ESCAPED" : state === "FAILED" ? "FAILED" : "-";
+      const escapeStatus = state === "COMPLETED" ? "ESCAPED" : state === "FAILED" ? "NOT ESCAPED" : "-";
 
       const score =
         cluesCompleted * CLUE_POINTS +
@@ -320,17 +322,28 @@ router.get("/leaderboard", async (_req, res) => {
     }
 
     entries.sort((a, b) => {
-      const rank = (s) => (s === "COMPLETED" ? 0 : s === "FAILED" ? 2 : 1);
-      const ra = rank(a._sortState);
-      const rb = rank(b._sortState);
-      if (ra !== rb) return ra - rb;
+      const priority = {
+        COMPLETED: 1,
+        FAILED: 2,
+        TREASURE_HUNT: 3,
+        WAITING_ESCAPE: 3,
+        ESCAPE_ACTIVE: 3,
+        NOT_STARTED: 4,
+      };
+
+      const pa = priority[a._sortState] ?? 5;
+      const pb = priority[b._sortState] ?? 5;
+      if (pa !== pb) return pa - pb;
 
       if (a._sortState === "COMPLETED") {
         return (a._sortTotalMs ?? Number.MAX_SAFE_INTEGER) - (b._sortTotalMs ?? Number.MAX_SAFE_INTEGER);
       }
 
-      if (a.score !== b.score) return b.score - a.score;
-      return b.clues_completed - a.clues_completed;
+      if (a._sortState === "FAILED") {
+        return b.clues_completed - a.clues_completed;
+      }
+
+      return 0;
     });
 
     res.json(entries.map(({ _sortState, _sortTotalMs, ...row }) => row));
@@ -390,6 +403,9 @@ router.post("/operator-end-team", async (req, res) => {
 
     const team = await Team.findById(teamId);
     if (!team) return res.status(404).json({ error: "Team not found" });
+    if (team.game_state === "COMPLETED" || team.game_state === "FAILED") {
+      return res.json({ ok: true, locked: true, user: toUiTeam(team) });
+    }
 
     if (String(outcome || "").toUpperCase() === "COMPLETED") {
       const now = new Date();
