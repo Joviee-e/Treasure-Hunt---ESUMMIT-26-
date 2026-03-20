@@ -92,8 +92,6 @@ textarea{background:rgba(0,255,159,.05);border:1px solid #00ff9f44;color:#00ff9f
 .qr-shell{position:relative;background:#fff;border:1px solid var(--line);padding:10px;display:inline-flex;border-radius:4px;box-shadow:0 0 16px #00ff9f33}
 .qr-canvas{line-height:0}
 .qr-canvas img,.qr-canvas canvas{display:block}
-.qr-logo-wrap{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);padding:4px;background:#fff;border-radius:8px;box-shadow:0 0 10px rgba(255,255,255,.35)}
-.qr-logo{display:block;object-fit:contain}
 
 @media(max-width:640px){.red-pill-btn{padding:14px 24px;font-size:14px}}
 </style>
@@ -140,9 +138,8 @@ let DB = {
 };
 
 const QR_ERROR_CORRECTION_LEVEL = "H";
-const QR_PRINT_SIZE = 500;
+const QR_PRINT_SIZE = 700;
 const QR_MARGIN_MODULES = 4;
-const QR_LOGO_RATIO = 0.18;
 const normalizeQrPayload=(raw)=>String(raw||"").trim().toUpperCase();
 const toCluePayload=(clue)=>normalizeQrPayload(clue?.validationCode);
 const safeFilePart=(v)=>String(v||"").replace(/[<>:"/\\|?*\x00-\x1F]/g,"_").replace(/\s+/g,"_");
@@ -550,9 +547,9 @@ function MatrixRain({intense=false}){
 }
 
 // â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
-// QR CODE GENERATOR (with logo overlay)
+// QR CODE GENERATOR (plain high-reliability QR)
 // â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
-function QRDisplay({value, logoSrc, size=160}){
+function QRDisplay({value, size=160}){
   const qrRef=useRef(null);
   const [ready,setReady]=useState(false);
   useEffect(()=>{
@@ -565,6 +562,7 @@ function QRDisplay({value, logoSrc, size=160}){
       text,
       width:size,
       height:size,
+      margin:QR_MARGIN_MODULES,
       colorDark:"#000000",
       colorLight:"#FFFFFF",
       correctLevel:QRCode.CorrectLevel[QR_ERROR_CORRECTION_LEVEL]
@@ -579,16 +577,11 @@ function QRDisplay({value, logoSrc, size=160}){
     <div className="qr-shell">
       <div ref={qrRef} className="qr-canvas" style={{width:size,height:size}}/>
       {!ready&&<div style={{position:"absolute",inset:0,display:"flex",alignItems:"center",justifyContent:"center",color:"#00ff9f44",fontSize:11,background:"rgba(0,0,0,.28)"}}>GENERATING...</div>}
-      {logoSrc&&ready&&(
-        <div className="qr-logo-wrap">
-          <img src={logoSrc} alt="Sponsor logo" className="qr-logo" style={{width:Math.round(size*QR_LOGO_RATIO),height:Math.round(size*QR_LOGO_RATIO)}}/>
-        </div>
-      )}
     </div>
   );
 }
 
-function generateQRDataUrl(value,size=QR_PRINT_SIZE,logoSrc="photos/logo.png"){
+function generateQRDataUrl(value,size=QR_PRINT_SIZE){
   return new Promise((resolve)=>{
     const text=normalizeQrPayload(value);
     if(typeof QRCode==="undefined"||!text){resolve(null);return;}
@@ -600,6 +593,7 @@ function generateQRDataUrl(value,size=QR_PRINT_SIZE,logoSrc="photos/logo.png"){
       text,
       width:outSize,
       height:outSize,
+      margin:QR_MARGIN_MODULES,
       colorDark:"#000000",
       colorLight:"#FFFFFF",
       correctLevel:QRCode.CorrectLevel[QR_ERROR_CORRECTION_LEVEL]
@@ -623,20 +617,7 @@ function generateQRDataUrl(value,size=QR_PRINT_SIZE,logoSrc="photos/logo.png"){
           ctx.fillStyle="#FFFFFF";
           ctx.fillRect(0,0,outSize,outSize);
           ctx.drawImage(qrImg,quietZonePx,quietZonePx,qrDrawSize,qrDrawSize);
-          if(!logoSrc){resolve(finalCanvas.toDataURL("image/png"));return;}
-          const logo=new Image();
-          logo.onload=()=>{
-            const lSize=Math.round(outSize*QR_LOGO_RATIO);
-            const x=Math.round((outSize-lSize)/2);
-            const y=Math.round((outSize-lSize)/2);
-            // White patch keeps center modules from bleeding into the logo.
-            ctx.fillStyle="#FFFFFF";
-            ctx.fillRect(x,y,lSize,lSize);
-            ctx.drawImage(logo,x,y,lSize,lSize);
-            resolve(finalCanvas.toDataURL("image/png"));
-          };
-          logo.onerror=()=>resolve(finalCanvas.toDataURL("image/png"));
-          logo.src=logoSrc;
+          resolve(finalCanvas.toDataURL("image/png"));
         };
         qrImg.onerror=()=>resolve(qrDataUrl);
         qrImg.src=qrDataUrl;
@@ -1985,7 +1966,7 @@ function CluesPage(){
         let qrImage="";
         if(existingClue){
           const updatedPayload=normalizeQrPayload(form.validationCode);
-          qrImage=await generateQRDataUrl(updatedPayload,QR_PRINT_SIZE,"photos/logo.png")||"";
+          qrImage=await generateQRDataUrl(updatedPayload,QR_PRINT_SIZE)||"";
         }
         await api(`/api/clue/${editingId}`,"PUT",{title:form.title,description:form.description,validationCode:form.validationCode,hint:form.hint,difficulty:form.difficulty,qrImage});
         flash("CLUE UPDATED");
@@ -1994,7 +1975,7 @@ function CluesPage(){
         const created=await api("/api/clue","POST",{title:form.title,description:form.description,validationCode:form.validationCode,hint:form.hint,difficulty:form.difficulty,qrImage:""});
         if(created?.clue?.id){
           const payload=normalizeQrPayload(created.clue.qrPayload||form.validationCode);
-          const qrImage=await generateQRDataUrl(payload,QR_PRINT_SIZE,"photos/logo.png")||"";
+          const qrImage=await generateQRDataUrl(payload,QR_PRINT_SIZE)||"";
           if(qrImage)await api(`/api/clue/${created.clue.id}`,"PUT",{qrImage});
         }
         flash("CLUE ADDED");
@@ -2033,7 +2014,7 @@ function CluesPage(){
   const downloadQR=async(clue)=>{
     const payload=payloadFor(clue);
     // Use stored image from DB if available, else generate on the fly
-    const src=clue.qrImage&&clue.qrImage.startsWith("data:")?clue.qrImage:await generateQRDataUrl(payload,QR_PRINT_SIZE,"photos/logo.png");
+    const src=clue.qrImage&&clue.qrImage.startsWith("data:")?clue.qrImage:await generateQRDataUrl(payload,QR_PRINT_SIZE);
     if(!src)return;
     saveDataUrl(src,qrFileName(payload));
   };
@@ -2072,7 +2053,7 @@ function CluesPage(){
                     <div style={{fontSize:10,color:"#00ff9f55"}}>{c.id}</div>
                   </td>
                   <td style={{padding:"8px 10px",color:"#00ccff"}}>{c.validationCode}</td>
-                  <td style={{padding:"8px 10px"}}><QRDisplay value={payloadFor(c)} logoSrc="photos/logo.png" size={86}/></td>
+                  <td style={{padding:"8px 10px"}}><QRDisplay value={payloadFor(c)} size={86}/></td>
                   <td style={{padding:"8px 10px"}}>
                     <div style={{display:"flex",gap:6,flexWrap:"wrap"}}>
                       <button style={{...S.btn,fontSize:9,padding:"3px 8px"}} onClick={()=>startEdit(c)}>EDIT</button>
@@ -2148,7 +2129,7 @@ function QRCodes(){
 
       const files=[];
       for(const item of entries){
-        const src=await generateQRDataUrl(item.payload,QR_PRINT_SIZE,"photos/logo.png");
+        const src=await generateQRDataUrl(item.payload,QR_PRINT_SIZE);
         if(!src)continue;
         const data=await dataUrlToBytes(src);
         files.push({name:item.filename,data});
@@ -2171,7 +2152,7 @@ function QRCodes(){
           {teams.map(u=><button key={u.id} style={{...S.btn,...(selTeam===u.id?{background:"#00ff9f1a",borderColor:"#00ff9f"}:{})}} onClick={()=>setSelTeam(u.id)}>{u.team_name}</button>)}
         </div>
         <div style={{fontSize:10,color:"#00ff9f44",fontFamily:"'Share Tech Mono'",marginBottom:8}}>
-          QR SPECS: H error correction · margin 4 · 500px PNG · center logo 18%
+          QR SPECS: H error correction · margin 4 · 700px PNG · plain black/white
         </div>
         <button style={{...S.btn,marginTop:8}} onClick={downloadAll} disabled={!teams.length||downloadingAll}>
           {downloadingAll?"BUILDING ZIP...":"DOWNLOAD ALL QR (ALL TEAMS)"}
@@ -2200,7 +2181,7 @@ function QRCard({clue,index,onDownload}){
       if(clue.qrImage&&clue.qrImage.startsWith("data:")){
         if(active)setQrSrc(clue.qrImage);
       }else{
-        const src=await generateQRDataUrl(value,QR_PRINT_SIZE,"photos/logo.png");
+        const src=await generateQRDataUrl(value,QR_PRINT_SIZE);
         if(active)setQrSrc(src);
       }
     })();
@@ -2213,8 +2194,8 @@ function QRCard({clue,index,onDownload}){
       <div style={{fontFamily:"'Share Tech Mono'",fontSize:11,color:"#00ff9f",marginBottom:12,letterSpacing:1}}>{payload}</div>
       <div style={{display:"flex",justifyContent:"center",marginBottom:12}}>
         {qrSrc
-          ?<img src={qrSrc} alt="QR" style={{width:160,height:160,imageRendering:"pixelated",border:"1px solid #00ff9f33"}}/>
-          :<QRDisplay value={payload} logoSrc="photos/logo.png" size={160}/>
+          ?<img src={qrSrc} alt="QR" style={{imageRendering:"pixelated",border:"1px solid #00ff9f33"}}/>
+          :<QRDisplay value={payload} size={160}/>
         }
       </div>
       <div style={{fontFamily:"'Share Tech Mono'",fontSize:9,color:"#00ff9f33",marginBottom:10,lineHeight:1.5}}>VALIDATION: {clue.validationCode}</div>
