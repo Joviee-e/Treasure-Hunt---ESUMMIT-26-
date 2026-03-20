@@ -318,5 +318,3 @@ router.post("/escape-queue", async (req, res) => {
 });
 
 module.exports = router;
-
-

@@ -427,6 +427,7 @@ function applyTeamsFromApi(teams){
     game_state:t.game_state||"NOT_STARTED",
     is_active:t.is_active!==false,
     failure_reason:t.failure_reason||null,
+    is_timer_active:!!t.is_timer_active,
     treasure_remaining_ms:t.treasure_remaining_ms??null,
     escape_remaining_ms:t.escape_remaining_ms??null,
   }))];
@@ -1428,10 +1429,10 @@ function EscapeTeamView({user,entry,serverEscStartTime,onVictory,onGameOver}){
 
   return(
     <div>
-      {escStart&&(
+      {escStart&&user?.is_timer_active&&user?.game_state!=="COMPLETED"&&user?.game_state!=="FAILED"&&(
         <Timer
           startTime={escStart}
-          duration={30*60}
+          duration={5*60}
           label="ESCAPE TIMER"
           onExpire={()=>setLocalExpired(true)}
         />
@@ -1634,7 +1635,7 @@ function Queue(){
               </div>
             </div>
             {(active||done)&&<>
-              {entry.escape_start_time&&<Timer startTime={entry.escape_start_time} duration={30*60} label="ESCAPE TIMER" onExpire={()=>{}}/>}
+              {entry.escape_start_time&&entry.is_timer_active!==false&&<Timer startTime={entry.escape_start_time} duration={5*60} label="ESCAPE TIMER" onExpire={()=>{}}/>}
               {PUZZLES.map((pp,pi)=>{const solved=(entry.puzzles_solved||[]).includes(pi);return(
                 <div key={pi} style={{display:"flex",alignItems:"center",gap:8,padding:"5px 0"}}>
                   <button style={{...S.btn,fontSize:10,padding:"2px 7px",borderColor:solved?"#00ff9f":"#00ff9f33"}} onClick={()=>toggleP(entry.team_id,pi)}>{solved?"âœ“":"â—‹"}</button>
@@ -1659,9 +1660,8 @@ function Board(){
     const pull=async()=>{
       try{
         const data=await api("/api/leaderboard");
-        if(data?.leaderboard){
-          setLbRows(data.leaderboard);
-        }
+        if(Array.isArray(data))setLbRows(data);
+        else if(Array.isArray(data?.leaderboard))setLbRows(data.leaderboard);
       }catch(_){
         // fallback to local DB
         try{
@@ -1676,29 +1676,37 @@ function Board(){
     const iv=setInterval(pull,5000);
     return()=>clearInterval(iv);
   },[]);
-  const rows=lbRows.map((r,i)=>{
-    const tSec=r.total_time_ms!=null?Math.floor(r.total_time_ms/1000):null;
-    const escapeStatus=r.game_state==="COMPLETED"?"ESCAPED":r.game_state==="ESCAPE_ACTIVE"?"IN ROOM":r.game_state==="WAITING_ESCAPE"?"QUEUED":r.game_state==="FAILED"?"FAILED":"—";
-    return{...r,tt:tSec,escapeStatus,sc:{huntScore:"—",escapeScore:"—",total:"—"}};
-  });
-  const ft=s=>s!==null?Math.floor(s/60)+"m "+(s%60)+"s":"—";
+
+  const rows=lbRows.map((r)=>({
+    team_name:r.team_name||"-",
+    clues_completed:Number.isFinite(Number(r.clues_completed))?Number(r.clues_completed):0,
+    total_clues:Number.isFinite(Number(r.total_clues))?Number(r.total_clues):0,
+    hunt_time:r.hunt_time||"-",
+    escape_time:r.escape_time||"-",
+    total_time:r.total_time||"-",
+    state:r.state||"NOT_STARTED",
+    escape_status:r.escape_status||"-",
+    score:Number.isFinite(Number(r.score))?Number(r.score):0,
+  }));
+
   return(
     <div style={{...S.panel,}} className="terminal-shell">
-      <div style={S.hdr}>[ LEADERBOARD — OPERATOR EYES ONLY ]</div>
+      <div style={S.hdr}>[ LEADERBOARD - OPERATOR EYES ONLY ]</div>
       <div style={{overflowX:"auto"}}>
         <table style={{width:"100%",borderCollapse:"collapse",fontFamily:"'Share Tech Mono'",fontSize:12,minWidth:640}}>
-          <thead><tr>{["#","TEAM","CLUES","HUNT TIME","ESCAPE TIME","TOTAL TIME","STATE","ESCAPE STATUS"].map(h=><th key={h} style={{padding:"8px 10px",borderBottom:"1px solid #00ff9f22",color:"#00ccff",textAlign:"left",fontFamily:"Orbitron",fontSize:9}}>{h}</th>)}</tr></thead>
+          <thead><tr>{["#","TEAM","CLUES","HUNT TIME","ESCAPE TIME","TOTAL TIME","STATE","ESCAPE STATUS","SCORE"].map(h=><th key={h} style={{padding:"8px 10px",borderBottom:"1px solid #00ff9f22",color:"#00ccff",textAlign:"left",fontFamily:"Orbitron",fontSize:9}}>{h}</th>)}</tr></thead>
           <tbody>
             {rows.map((r,i)=>(
-              <tr key={r.id} style={{borderBottom:"1px solid #00ff9f0a",background:i===0?"rgba(0,255,159,0.04)":"transparent"}}>
+              <tr key={`${r.team_name}_${i}`} style={{borderBottom:"1px solid #00ff9f0a",background:i===0?"rgba(0,255,159,0.04)":"transparent"}}>
                 <td style={{padding:"8px 10px",color:i===0?"#ffcc00":"#00ff9f55",fontFamily:"Orbitron",fontWeight:i===0?"bold":"normal"}}>#{i+1}</td>
-                <td style={{padding:"8px 10px",color:r.game_state==="FAILED"?"#ff003c":"#00ff9f",fontFamily:"Orbitron",fontSize:10}}>{r.team_name}</td>
-                <td style={{padding:"8px 10px"}}>{r.completed_clues||0}/{r.total_clues||"?"}</td>
-                <td style={{padding:"8px 10px",color:"#00ff9f"}}>{r.sc.huntScore}</td>
-                <td style={{padding:"8px 10px",color:"#00ccff"}}>{r.sc.escapeScore}</td>
-                <td style={{padding:"8px 10px",fontFamily:"Orbitron",fontSize:i===0?16:13,color:i===0?"#ffcc00":"#00ff9f"}}>{r.sc.total}</td>
-                <td style={{padding:"8px 10px",color:"#00ff9f44"}}>{ft(r.tt)}</td>
-                <td style={{padding:"8px 10px",color:r.escapeStatus==="ESCAPED"?"#00ff9f":r.escapeStatus==="IN ROOM"?"#ffcc00":"#00ff9f33",fontFamily:"Orbitron",fontSize:9}}>{r.escapeStatus}</td>
+                <td style={{padding:"8px 10px",color:r.state==="FAILED"?"#ff003c":"#00ff9f",fontFamily:"Orbitron",fontSize:10}}>{r.team_name}</td>
+                <td style={{padding:"8px 10px"}}>{r.clues_completed}/{r.total_clues}</td>
+                <td style={{padding:"8px 10px",color:"#00ff9f"}}>{r.hunt_time}</td>
+                <td style={{padding:"8px 10px",color:"#00ccff"}}>{r.escape_time}</td>
+                <td style={{padding:"8px 10px",fontFamily:"Orbitron",fontSize:i===0?16:13,color:i===0?"#ffcc00":"#00ff9f"}}>{r.total_time}</td>
+                <td style={{padding:"8px 10px",color:"#00ff9f44"}}>{r.state}</td>
+                <td style={{padding:"8px 10px",color:r.escape_status==="ESCAPED"?"#00ff9f":r.escape_status==="FAILED"?"#ff003c":"#00ff9f33",fontFamily:"Orbitron",fontSize:9}}>{r.escape_status}</td>
+                <td style={{padding:"8px 10px",color:"#ffcc00",fontFamily:"Orbitron"}}>{r.score}</td>
               </tr>
             ))}
           </tbody>

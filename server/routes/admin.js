@@ -10,7 +10,6 @@ const Clue = require("../models/Clue");
 const { Assignment } = require("../models/Legacy");
 const { toClueJson, toUiTeam, normalizeAnswer } = require("../utils/serialize");
 const { failTeam } = require("../utils/timer");
-const { TREASURE_DURATION_MS, ESCAPE_DURATION_MS } = require("../utils/config");
 
 const CLUE_POINTS = 100;
 const ESCAPE_COMPLETION_BONUS = 500;
@@ -240,7 +239,6 @@ router.get("/leaderboard", async (_req, res) => {
       .sort({ order_index: 1, createdAt: 1 })
       .select({ _id: 1 });
     const fallbackAssigned = allClues.map((c) => c._id);
-    const maxTotalSeconds = Math.floor((TREASURE_DURATION_MS + ESCAPE_DURATION_MS) / 1000);
 
     const entries = [];
     for (const team of teams) {
@@ -301,15 +299,9 @@ router.get("/leaderboard", async (_req, res) => {
       const state = team.game_state || "NOT_STARTED";
       const escapeStatus = state === "COMPLETED" ? "ESCAPED" : state === "FAILED" ? "FAILED" : "-";
 
-      const totalSeconds = totalMs !== null ? Math.floor(totalMs / 1000) : null;
-      const timeBonus = state === "COMPLETED" && totalSeconds !== null
-        ? Math.max(0, Math.floor((maxTotalSeconds - totalSeconds) / 10))
-        : 0;
-
       const score =
         cluesCompleted * CLUE_POINTS +
-        (state === "COMPLETED" ? ESCAPE_COMPLETION_BONUS : 0) +
-        timeBonus;
+        (state === "COMPLETED" ? ESCAPE_COMPLETION_BONUS : 0);
 
       entries.push({
         team_name: team.name || "-",
@@ -341,9 +333,7 @@ router.get("/leaderboard", async (_req, res) => {
       return b.clues_completed - a.clues_completed;
     });
 
-    res.json({
-      leaderboard: entries.map(({ _sortState, _sortTotalMs, ...row }) => row),
-    });
+    res.json(entries.map(({ _sortState, _sortTotalMs, ...row }) => row));
   } catch (err) {
     console.error("[leaderboard]", err);
     res.status(500).json({ error: "Internal server error" });
