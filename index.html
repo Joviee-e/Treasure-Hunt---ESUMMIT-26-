@@ -92,6 +92,11 @@ textarea{background:rgba(0,255,159,.05);border:1px solid #00ff9f44;color:#00ff9f
 .qr-shell{position:relative;background:#fff;border:1px solid var(--line);padding:10px;display:inline-flex;border-radius:4px;box-shadow:0 0 16px #00ff9f33}
 .qr-canvas{line-height:0}
 .qr-canvas img,.qr-canvas canvas{display:block}
+.qr-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px;align-items:start}
+.qr-card{overflow:hidden}
+.qr-card-media{display:flex;justify-content:center;align-items:center;padding:16px;overflow:hidden;max-width:100%}
+.qr-card-media img{max-width:100%;height:auto;object-fit:contain;display:block}
+.qr-card-media canvas{max-width:100%;height:auto;display:block}
 
 @media(max-width:640px){.red-pill-btn{padding:14px 24px;font-size:14px}}
 </style>
@@ -2159,7 +2164,7 @@ function QRCodes(){
         </button>
       </div>
 
-      <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fill,minmax(240px,1fr))",gap:16}}>
+      <div className="qr-grid">
         {qrList.map((c,idx)=>(
           <QRCard key={c.id} clue={c} index={idx+1} onDownload={downloadQR}/>
         ))}
@@ -2189,10 +2194,10 @@ function QRCard({clue,index,onDownload}){
   },[clue.id,clue.validationCode,clue.qrImage]);
 
   return(
-    <div style={{...S.panel,textAlign:"center"}} className="terminal-shell">
+    <div style={{...S.panel,textAlign:"center"}} className="terminal-shell qr-card">
       <div style={{fontFamily:"Orbitron",fontSize:10,color:"#00ccff",letterSpacing:2,marginBottom:8}}>CLUE {index}</div>
       <div style={{fontFamily:"'Share Tech Mono'",fontSize:11,color:"#00ff9f",marginBottom:12,letterSpacing:1}}>{payload}</div>
-      <div style={{display:"flex",justifyContent:"center",marginBottom:12}}>
+      <div className="qr-card-media" style={{marginBottom:12}}>
         {qrSrc
           ?<img src={qrSrc} alt="QR" style={{imageRendering:"pixelated",border:"1px solid #00ff9f33"}}/>
           :<QRDisplay value={payload} size={160}/>
