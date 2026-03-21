@@ -1,0 +1,1691 @@
+﻿OPERATION: WAKE UP
+MASTER CLUE PATH DOCUMENT
+16 Teams  ·  All Unique Paths  ·  All Roads Lead to Boys Entrance
+NORTH QUAD
+CENTRAL QUAD
+FOYER QUAD
+ENTRY QUAD
+Teams 1–4
+Workshop · Back Gate
+Balbhavan · Parking
+Teams 5–8
+Lawn · Canteen
+Security · Formix
+Teams 9–12
+Polytech · Degree
+Fountain
+Teams 13–16
+Girls Entrance
+Fountain · Degree
+ROUTING LOGIC
+› All 16 teams start at AX 316 and receive Clue 1, which splits them into 4 different starting zones across campus.
+› After clue 3, all paths begin converging toward the Degree Foyer, Fountain, and Girls Entrance cluster.
+› The final 2 clues for all 16 teams funnel through that cluster directly into Boys Entrance.
+› No two teams share the same sequential path. Paths intersect at individual locations but never in the same order.
+› Every team ends at Boys Entrance. Every final clue is a unique riddle pointing there.
+TEAM
+CLUE 1
+CLUE 2
+CLUE 3
+CLUE 4
+CLUE 5
+CLUE 6
+FINAL
+NEO
+Shed
+Lamp Post
+Wall named S
+(navigate to
+Lawn
+Seats
+Staircase
+TRINITY
+Shed
+Security Cab
+Generator
+(navigate to
+Lawn
+Flag Pole
+Ramp
+MORPHEUS
+Red Pipe
+Trees
+Generator
+(navigate to
+Lawn
+Stairs
+Seats/Chair
+ORACLE
+Trash
+Chairs
+Pipe
+(navigate to
+Lawn
+Table
+Lift Area
+AGENT SMITH
+Volleyball N
+Wall named S
+Road Roller
+(navigate to
+Lawn
+Stairs
+Ramp
+NIOBE
+Rabbit Cage
+Front Gate C
+Ramp Entranc
+(navigate to
+Lawn
+Ramp
+Lift Area
+SWITCH
+Wall named S
+Rabbit Cage
+Security Cab
+(navigate to
+Lawn
+Stairs
+Staircase
+APOC
+Road Roller
+Fish Tank
+Stationary
+(navigate to
+Lawn
+Seat
+Seats/Chair
+DOZER
+Lift Area
+Generator
+Trees
+(navigate to
+Lawn
+Table
+Staircase
+TANK
+Golf Cart
+Fish Tank
+Trees
+(navigate to
+Lawn
+Ramp
+Ramp
+SERAPH
+Front Gate C
+Stationary
+Trees
+(navigate to
+Lawn
+Seat
+Lift Area
+MEROVINGIAN
+Lift Area
+Lamp Post
+Red Pipe
+(navigate to
+Lawn
+Lift Area
+Staircase
+GHOST
+Ramp
+Volleyball N
+Chairs
+(navigate to
+Lawn
+Flag Pole
+Seats/Chair
+LOCK
+Table
+Pipe
+Shed
+(navigate to
+Lawn
+Ramp
+Staircase
+LINK
+Stairs
+Lamp Post
+Security Cab
+(navigate to
+Lawn
+Stairs
+Lift Area
+PERSEPHONE
+Lift Area
+Wall named S
+Ramp Entranc
+(navigate to
+Lawn
+Stairs
+Staircase
+TEAM 1  —  TEAM NEO
+Quadrant: NORTH  ·  7 Clues  ·  Start: AX 316
+PATH SUMMARY — TEAM NEO
+STEP
+LOCATION
+ACTIVITY
+START
+AX 316
+Red Pill Kit distribution
+Clue 1
+Workshop → Shed
+Bottle flip — one member must land a bottle flip in 3 a…
+Clue 2
+Canteen Alley → Lamp Post
+Paper toss — crumple a paper ball and land it in a bin …
+Clue 3
+Canteen Alley → Wall named SWAPNIL
+One team member recites the Matrix opening quote: 'Wake…
+Clue 4
+Lawn → (navigate to Global Reach Station)
+Coin toss — call correctly 2 of 3 against the volunteer…
+Clue 5
+Global Reach Station → Lawn
+GLOBAL REACH BRANDED ACTIVITY — 'Break Through the Nois…
+Clue 6
+Fountain → Seats
+Tower build — using 5 plastic cups, build the tallest s…
+FINAL
+Boys Entrance → Staircase
+FINAL CHECKPOINT — Master Code assembly and vault passk…
+── CLUE CARDS ──────────────────────────────────────────
+1
+CLUE
+CLUE 1  ›  Workshop → Shed
+Before class begins, someone must shape the wood and bend the steel. Go where hands work and machines hum — not to study, but to build. Find the shadow of the shed.
+⬥ ACTIVITY:  Bottle flip — one member must land a bottle flip in 3 attempts to receive the next clue.
+2
+CLUE
+CLUE 2  ›  Canteen Alley → Lamp Post
+Every campus has a hunger. Follow the smell of food and the sound of crowds until you find the corridor that feeds them all. Look for the tall sentinel that stands guard — not of iron, not of flesh, but it holds light above the world.
+⬥ ACTIVITY:  Paper toss — crumple a paper ball and land it in a bin from 3 metres to proceed.
+3
+CLUE
+CLUE 3  ›  Canteen Alley → Wall named SWAPNIL
+Something was scrawled here — not by the system, not by an Agent, but by a human who wanted to leave their mark. A wall remembers what people forget. Find the wall that carries a name.
+⬥ ACTIVITY:  One team member recites the Matrix opening quote: 'Wake up, Neo...' from memory (prompted once allowed).
+4
+CLUE
+CLUE 4  ›  Lawn → (navigate to Global Reach Station)
+You have followed the code through alleys, across boundaries, and into buildings. Now the simulation opens up — literally. Find the stretch of open ground where grass grows and the sky is unobstructed. Something has been set up in the field that was not there yesterday.
+⬥ ACTIVITY:  Coin toss — call correctly 2 of 3 against the volunteer to receive directions to the Global Reach Station on the Lawn.
+5
+CLUE
+CLUE 5  ›  Global Reach Station → Lawn
+Every signal carries noise. Every message has a sender. You have been chasing code across this campus — but code does not exist without communication. Somewhere on the open ground, a broadcast waits. A station has been set up in the field. Find the signal. Find the booth. Find Global Reach.
+⬥ ACTIVITY:  GLOBAL REACH BRANDED ACTIVITY — 'Break Through the Noise': Complete the Global Reach challenge (decoding a brand message, business pitch, or communication task as designed by Global Reach). On successful completion, the Global Reach representative awards Clue Card 5.
+6
+CLUE
+CLUE 6  ›  Fountain → Seats
+Water flows, light plays, and flags stand tall in the wind. Find the meeting place at the heart of the campus where the fountain speaks and stone seats wait in silence around it.
+⬥ ACTIVITY:  Tower build — using 5 plastic cups, build the tallest standing tower in 30 seconds.
+⬛
+FINAL
+FINAL CLUE  →  CLUE 7  ›  BOYS ENTRANCE
+You are almost free. One final threshold remains — the entrance that belongs to one half of this campus. Not the ramp, not the lift. Find where feet have climbed for years, worn smooth by a thousand soles. The final checkpoint waits at the base of what rises.
+⬥ ACTIVITY:  FINAL CHECKPOINT — Master Code assembly and vault passkey.
+TEAM 2  —  TEAM TRINITY
+Quadrant: NORTH  ·  7 Clues  ·  Start: AX 316
+PATH SUMMARY — TEAM TRINITY
+STEP
+LOCATION
+ACTIVITY
+START
+AX 316
+Red Pill Kit distribution
+Clue 1
+Workshop → Shed
+Pencil balance — balance a pencil horizontally on one f…
+Clue 2
+Back Gate → Security Cabin
+Rock paper scissors — team plays as one unit (majority …
+Clue 3
+Canteen Alley → Generator
+Statue freeze — on the volunteer's signal, all 4 member…
+Clue 4
+Lawn → (navigate to Global Reach Station)
+Category sprint — name 5 Matrix characters in 10 second…
+Clue 5
+Global Reach Station → Lawn
+GLOBAL REACH BRANDED ACTIVITY — 'Break Through the Nois…
+Clue 6
+Fountain → Flag Pole
+Word chain — team must chain 5 words related to The Mat…
+FINAL
+Boys Entrance → Ramp
+FINAL CHECKPOINT — Master Code assembly and vault passk…
+── CLUE CARDS ──────────────────────────────────────────
+1
+CLUE
+CLUE 1  ›  Workshop → Shed
+The campus keeps machines here — not the digital kind, but the kind that grind and cut and shape. A small structure beside the larger one holds the secrets of those who work with their hands.
+⬥ ACTIVITY:  Pencil balance — balance a pencil horizontally on one finger for 5 seconds.
+2
+CLUE
+CLUE 2  ›  Back Gate → Security Cabin
+Behind the campus lies a gate that few use. Not the main face of the institution but its forgotten back. Someone sits here, always watching, always present. Find where the guardian rests.
+⬥ ACTIVITY:  Rock paper scissors — team plays as one unit (majority vote per round) vs. the volunteer. Best of 5.
+3
+CLUE
+CLUE 3  ›  Canteen Alley → Generator
+Somewhere on this campus an engine breathes without moving — it powers things in the dark, waiting for when the real power fails. Find the hum in the alley.
+⬥ ACTIVITY:  Statue freeze — on the volunteer's signal, all 4 members must freeze mid-motion for 10 seconds without flinching.
+4
+CLUE
+CLUE 4  ›  Lawn → (navigate to Global Reach Station)
+Between buildings lies a breath of nature — an open expanse where sport once played and feet once ran. The campus holds this green space with care. Go to where the ground is soft and the sky is wide, and find what has arrived there recently.
+⬥ ACTIVITY:  Category sprint — name 5 Matrix characters in 10 seconds as a team to receive directions to the Global Reach Station.
+5
+CLUE
+CLUE 5  ›  Global Reach Station → Lawn
+Every signal carries noise. Every message has a sender. You have been chasing code across this campus — but code does not exist without communication. Somewhere on the open ground, a broadcast waits. A station has been set up in the field. Find the signal. Find the booth. Find Global Reach.
+⬥ ACTIVITY:  GLOBAL REACH BRANDED ACTIVITY — 'Break Through the Noise': Complete the Global Reach challenge (decoding a brand message, business pitch, or communication task as designed by Global Reach). On successful completion, the Global Reach representative awards Clue Card 5.
+6
+CLUE
+CLUE 6  ›  Fountain → Flag Pole
+Flags tell stories of allegiance. Find the tall stake of loyalty that rises near still water and arrange yourselves in its shadow.
+⬥ ACTIVITY:  Word chain — team must chain 5 words related to The Matrix, each starting with the last letter of the previous.
+⬛
+FINAL
+FINAL CLUE  →  CLUE 7  ›  BOYS ENTRANCE
+The simulation ends where arrivals begin. Not where girls enter, not where machines park — where the other half of this campus first crosses the threshold. Find the elevated path that greets them gently.
+⬥ ACTIVITY:  FINAL CHECKPOINT — Master Code assembly and vault passkey.
+TEAM 3  —  TEAM MORPHEUS
+Quadrant: NORTH  ·  7 Clues  ·  Start: AX 316
+PATH SUMMARY — TEAM MORPHEUS
+STEP
+LOCATION
+ACTIVITY
+START
+AX 316
+Red Pill Kit distribution
+Clue 1
+Parking Lot → Red Pipe
+Coin spin — spin a coin on a flat surface and keep it s…
+Clue 2
+Balbhavan → Trees
+Leaf catch — one member must catch a falling leaf (drop…
+Clue 3
+Canteen Alley → Generator
+Human knot — team ties themselves in a human knot and m…
+Clue 4
+Lawn → (navigate to Global Reach Station)
+Guess the object — blindfolded member identifies a comm…
+Clue 5
+Global Reach Station → Lawn
+GLOBAL REACH BRANDED ACTIVITY — 'Break Through the Nois…
+Clue 6
+Fountain → Stairs
+Dumb charades — one member acts out a Matrix scene, tea…
+FINAL
+Boys Entrance → Seats/Chair
+FINAL CHECKPOINT — Master Code assembly and vault passk…
+── CLUE CARDS ──────────────────────────────────────────
+1
+CLUE
+CLUE 1  ›  Parking Lot → Red Pipe
+In a lot where machines sleep in rows, something red stands out — not a vehicle, not a sign, but a conduit through which pressure flows. Find what carries force in the place of parked metal.
+⬥ ACTIVITY:  Coin spin — spin a coin on a flat surface and keep it spinning for 5 seconds.
+2
+CLUE
+CLUE 2  ›  Balbhavan → Trees
+Living things grow here, yet they are not cultivated — they simply exist, wild and rooted, at the edge of a place once meant for children. Find the trees where Balbhavan breathes.
+⬥ ACTIVITY:  Leaf catch — one member must catch a falling leaf (dropped by volunteer from height) before it hits the ground.
+3
+CLUE
+CLUE 3  ›  Canteen Alley → Generator
+The campus breathes through pipes and hums through wires. In the alley that feeds hunger, find the metal body that never moves but keeps everything running when the light dies.
+⬥ ACTIVITY:  Human knot — team ties themselves in a human knot and must untangle without releasing hands.
+4
+CLUE
+CLUE 4  ›  Lawn → (navigate to Global Reach Station)
+Every matrix has a clearing — a place where the code thins and the real bleeds through. On this campus, that place is the open field where the grass grows and the horizon is unbroken. Head there. Something is waiting.
+⬥ ACTIVITY:  Guess the object — blindfolded member identifies a common object by touch in 10 seconds to earn directions to the Global Reach Station.
+5
+CLUE
+CLUE 5  ›  Global Reach Station → Lawn
+Every signal carries noise. Every message has a sender. You have been chasing code across this campus — but code does not exist without communication. Somewhere on the open ground, a broadcast waits. A station has been set up in the field. Find the signal. Find the booth. Find Global Reach.
+⬥ ACTIVITY:  GLOBAL REACH BRANDED ACTIVITY — 'Break Through the Noise': Complete the Global Reach challenge (decoding a brand message, business pitch, or communication task as designed by Global Reach). On successful completion, the Global Reach representative awards Clue Card 5.
+6
+CLUE
+CLUE 6  ›  Fountain → Stairs
+Stone steps descend near water and light. The fountain knows the way — but look for where feet go down, not up, near where the water plays.
+⬥ ACTIVITY:  Dumb charades — one member acts out a Matrix scene, team guesses in 30 seconds.
+⬛
+FINAL
+FINAL CLUE  →  CLUE 7  ›  BOYS ENTRANCE
+You have navigated the simulation. One entrance remains — not for vehicles, not for ceremony. It belongs to the other half. Find where they gather on seats at the final threshold, and your checkpoint awaits.
+⬥ ACTIVITY:  FINAL CHECKPOINT — Master Code assembly and vault passkey.
+TEAM 4  —  TEAM ORACLE
+Quadrant: NORTH  ·  7 Clues  ·  Start: AX 316
+PATH SUMMARY — TEAM ORACLE
+STEP
+LOCATION
+ACTIVITY
+START
+AX 316
+Red Pill Kit distribution
+Clue 1
+Parking Lot → Trash
+Paper airplane — fold and fly a paper airplane. Must tr…
+Clue 2
+Back Gate → Chairs
+Silent coordination — team must count to 10 aloud as a …
+Clue 3
+Canteen Alley → Pipe
+Stacking — stack 10 coins into a tower using only one h…
+Clue 4
+Lawn → (navigate to Global Reach Station)
+Balance beam — walk heel to toe along a straight line o…
+Clue 5
+Global Reach Station → Lawn
+GLOBAL REACH BRANDED ACTIVITY — 'Break Through the Nois…
+Clue 6
+Girls Entrance → Table
+Jenga-style — carefully remove a block from a pre-built…
+FINAL
+Boys Entrance → Lift Area
+FINAL CHECKPOINT — Master Code assembly and vault passk…
+── CLUE CARDS ──────────────────────────────────────────
+1
+CLUE
+CLUE 1  ›  Parking Lot → Trash
+Not all waste is without order. In the place where machines sleep, something stands ready to receive what is discarded. Find the receptacle among the trees and parked metal.
+⬥ ACTIVITY:  Paper airplane — fold and fly a paper airplane. Must travel at least 2 metres to qualify.
+2
+CLUE
+CLUE 2  ›  Back Gate → Chairs
+At the campus boundary where few tread, something watches and something waits. Chairs line a small shelter — not for learning, not for eating, but for the patient guardians of the gate.
+⬥ ACTIVITY:  Silent coordination — team must count to 10 aloud as a group with no single person saying two consecutive numbers and no overlap. Restart on mistake.
+3
+CLUE
+CLUE 3  ›  Canteen Alley → Pipe
+Something runs beneath or beside structures to channel what would otherwise overflow. In the alley of hunger, a pipe carries burden invisibly. Find it.
+⬥ ACTIVITY:  Stacking — stack 10 coins into a tower using only one hand.
+4
+CLUE
+CLUE 4  ›  Lawn → (navigate to Global Reach Station)
+The Oracle said: seek the open space. Not a foyer, not an alley — the place where the campus breathes. Where children once played or athletes once competed on grass. A visitor has arrived there. Find the booth in the field.
+⬥ ACTIVITY:  Balance beam — walk heel to toe along a straight line of 5 metres to earn directions to the Global Reach Station on the Lawn.
+5
+CLUE
+CLUE 5  ›  Global Reach Station → Lawn
+Every signal carries noise. Every message has a sender. You have been chasing code across this campus — but code does not exist without communication. Somewhere on the open ground, a broadcast waits. A station has been set up in the field. Find the signal. Find the booth. Find Global Reach.
+⬥ ACTIVITY:  GLOBAL REACH BRANDED ACTIVITY — 'Break Through the Noise': Complete the Global Reach challenge (decoding a brand message, business pitch, or communication task as designed by Global Reach). On successful completion, the Global Reach representative awards Clue Card 5.
+6
+CLUE
+CLUE 6  ›  Girls Entrance → Table
+Where the entry is feminine and the architecture welcomes, a table stands — a flat surface that has seen a thousand things placed upon it. Find it near the entrance made for them.
+⬥ ACTIVITY:  Jenga-style — carefully remove a block from a pre-built block tower without collapsing it.
+⬛
+FINAL
+FINAL CLUE  →  CLUE 7  ›  BOYS ENTRANCE
+Cross now to where the other half begins. Not the ramp, not the chair — find the vertical pathway that was built for those who cannot climb. The lift area at the final entrance holds your destiny.
+⬥ ACTIVITY:  FINAL CHECKPOINT — Master Code assembly and vault passkey.
+TEAM 5  —  TEAM AGENT SMITH
+Quadrant: CENTRAL  ·  7 Clues  ·  Start: AX 316
+PATH SUMMARY — TEAM AGENT SMITH
+STEP
+LOCATION
+ACTIVITY
+START
+AX 316
+Red Pill Kit distribution
+Clue 1
+Lawn → Volleyball Net
+Bottle flip — must land bottle upright on a flat surfac…
+Clue 2
+Canteen Alley → Wall named SWAPNIL
+Freeze frame — entire team freezes on command for 15 se…
+Clue 3
+Lawn → Road Roller
+Coin toss — call it correctly 2 out of 3 against the vo…
+Clue 4
+Lawn → (navigate to Global Reach Station)
+Human sculpture — the team has 20 seconds to form a sin…
+Clue 5
+Global Reach Station → Lawn
+GLOBAL REACH BRANDED ACTIVITY — 'Break Through the Nois…
+Clue 6
+Girls Entrance → Stairs
+Rhythm tap — volunteer taps a rhythm, team replicates i…
+FINAL
+Boys Entrance → Ramp
+FINAL CHECKPOINT — Master Code assembly and vault passk…
+── CLUE CARDS ──────────────────────────────────────────
+1
+CLUE
+CLUE 1  ›  Lawn → Volleyball Net
+The grass here was meant for sport — not the running kind, but the kind where a ball must not touch the ground. Find the net that divides air from air in the open field.
+⬥ ACTIVITY:  Bottle flip — must land bottle upright on a flat surface within 3 attempts.
+2
+CLUE
+CLUE 2  ›  Canteen Alley → Wall named SWAPNIL
+The campus breathes life in the alley of hunger. But look for where a name was painted — not a sign, not a notice, but a declaration left in paint by someone who needed the world to know.
+⬥ ACTIVITY:  Freeze frame — entire team freezes on command for 15 seconds in any position.
+3
+CLUE
+CLUE 3  ›  Lawn → Road Roller
+Something enormous and yellow once shaped the earth here. It no longer moves — it rests where the grass grows, a relic of construction sleeping in the open. Find the great machine at rest.
+⬥ ACTIVITY:  Coin toss — call it correctly 2 out of 3 against the volunteer.
+4
+CLUE
+CLUE 4  ›  Lawn → (navigate to Global Reach Station)
+The system is everywhere — and today, the system has placed something in the open. Not inside any building, not in any corridor. Out in the grass, under the sky, a station has been erected for all who pass through. Find it on the lawn.
+⬥ ACTIVITY:  Human sculpture — the team has 20 seconds to form a single still sculpture using all 4 bodies to earn directions to the Global Reach Station.
+5
+CLUE
+CLUE 5  ›  Global Reach Station → Lawn
+Every signal carries noise. Every message has a sender. You have been chasing code across this campus — but code does not exist without communication. Somewhere on the open ground, a broadcast waits. A station has been set up in the field. Find the signal. Find the booth. Find Global Reach.
+⬥ ACTIVITY:  GLOBAL REACH BRANDED ACTIVITY — 'Break Through the Noise': Complete the Global Reach challenge (decoding a brand message, business pitch, or communication task as designed by Global Reach). On successful completion, the Global Reach representative awards Clue Card 5.
+6
+CLUE
+CLUE 6  ›  Girls Entrance → Stairs
+At the entrance reserved for one gender, find the ascending path made of stone — not a ramp, not a lift, but the structure of steps that rises to greet the ones who climb.
+⬥ ACTIVITY:  Rhythm tap — volunteer taps a rhythm, team replicates it together.
+⬛
+FINAL
+FINAL CLUE  →  CLUE 7  ›  BOYS ENTRANCE
+You have almost exited the simulation. Find the entrance that completes the symmetry — the one that mirrors what you just left, on the other side of campus. Go to where boys first arrive and find the elevated passage of welcome.
+⬥ ACTIVITY:  FINAL CHECKPOINT — Master Code assembly and vault passkey.
+TEAM 6  —  TEAM NIOBE
+Quadrant: CENTRAL  ·  7 Clues  ·  Start: AX 316
+PATH SUMMARY — TEAM NIOBE
+STEP
+LOCATION
+ACTIVITY
+START
+AX 316
+Red Pill Kit distribution
+Clue 1
+Lawn → Rabbit Cage
+Paper toss — land a crumpled paper ball in a bucket fro…
+Clue 2
+Security Cabin → Front Gate Cabin
+Rock paper scissors — team majority vote vs volunteer. …
+Clue 3
+Formix Entrance → Ramp Entrance
+Tongue twister relay — each member completes a differen…
+Clue 4
+Lawn → (navigate to Global Reach Station)
+Category sprint — 5 things you'd find in The Matrix uni…
+Clue 5
+Global Reach Station → Lawn
+GLOBAL REACH BRANDED ACTIVITY — 'Break Through the Nois…
+Clue 6
+Girls Entrance → Ramp
+Mirror walk — one member leads, another mirrors every m…
+FINAL
+Boys Entrance → Lift Area
+FINAL CHECKPOINT — Master Code assembly and vault passk…
+── CLUE CARDS ──────────────────────────────────────────
+1
+CLUE
+CLUE 1  ›  Lawn → Rabbit Cage
+A cage holds not what you think — not criminals, not machines. Something small and warm lives here, watched over by the open sky and the grass. Find what hops in the lawn.
+⬥ ACTIVITY:  Paper toss — land a crumpled paper ball in a bucket from 2 metres, first attempt wins; 3 attempts max.
+2
+CLUE
+CLUE 2  ›  Security Cabin → Front Gate Cabin
+The front face of the institution has a small shelter — not a building, not a booth. A guardian sits within, watching all who enter and exit. Find the cabin at the very face of the campus.
+⬥ ACTIVITY:  Rock paper scissors — team majority vote vs volunteer. Best of 5 rounds.
+3
+CLUE
+CLUE 3  ›  Formix Entrance → Ramp Entrance
+The building bearing a commercial name greets visitors with an angled path. Not a stair, not a lift — a slope that rises gently to meet the door. Go to where Formix begins.
+⬥ ACTIVITY:  Tongue twister relay — each member completes a different tongue twister in sequence without error.
+4
+CLUE
+CLUE 4  ›  Lawn → (navigate to Global Reach Station)
+Navigation brought you this far. Now the simulation gives you open sky. The lawn — that expanse of green that most walk past without thinking — holds something new today. A presence has arrived. Seek it in the open field.
+⬥ ACTIVITY:  Category sprint — 5 things you'd find in The Matrix universe, in 10 seconds as a team, to earn directions to the Global Reach Station.
+5
+CLUE
+CLUE 5  ›  Global Reach Station → Lawn
+Every signal carries noise. Every message has a sender. You have been chasing code across this campus — but code does not exist without communication. Somewhere on the open ground, a broadcast waits. A station has been set up in the field. Find the signal. Find the booth. Find Global Reach.
+⬥ ACTIVITY:  GLOBAL REACH BRANDED ACTIVITY — 'Break Through the Noise': Complete the Global Reach challenge (decoding a brand message, business pitch, or communication task as designed by Global Reach). On successful completion, the Global Reach representative awards Clue Card 5.
+6
+CLUE
+CLUE 6  ›  Girls Entrance → Ramp
+Near the entrance made for one half of this campus, a flat elevated path of welcome slopes down gently. It was made for those who cannot take the stairs. Find the ramp at the feminine entrance.
+⬥ ACTIVITY:  Mirror walk — one member leads, another mirrors every movement for 15 seconds.
+⬛
+FINAL
+FINAL CLUE  →  CLUE 7  ›  BOYS ENTRANCE
+The final threshold is near. Cross to the other entrance — the masculine mirror of where you stood. Find the lift zone, the vertical passage for those who cannot climb. The checkpoint stands beside it.
+⬥ ACTIVITY:  FINAL CHECKPOINT — Master Code assembly and vault passkey.
+TEAM 7  —  TEAM SWITCH
+Quadrant: CENTRAL  ·  7 Clues  ·  Start: AX 316
+PATH SUMMARY — TEAM SWITCH
+STEP
+LOCATION
+ACTIVITY
+START
+AX 316
+Red Pill Kit distribution
+Clue 1
+Canteen Alley → Wall named SWAPNIL
+Pencil balance — balance a pencil on one finger for 5 s…
+Clue 2
+Lawn → Rabbit Cage
+Human knot — tie a human knot and untangle without rele…
+Clue 3
+Back Gate → Security Cabin
+Statue freeze — all 4 freeze mid-movement on command fo…
+Clue 4
+Lawn → (navigate to Global Reach Station)
+Guess the object — blindfolded member identifies object…
+Clue 5
+Global Reach Station → Lawn
+GLOBAL REACH BRANDED ACTIVITY — 'Break Through the Nois…
+Clue 6
+Girls Entrance → Stairs
+Word chain — 5 words related to freedom, each starting …
+FINAL
+Boys Entrance → Staircase
+FINAL CHECKPOINT — Master Code assembly and vault passk…
+── CLUE CARDS ──────────────────────────────────────────
+1
+CLUE
+CLUE 1  ›  Canteen Alley → Wall named SWAPNIL
+Someone has left a name on a wall in the passage of hunger. Not a logo, not a sign — a person's claim to permanence in paint. Find the wall in the alley that feeds the campus.
+⬥ ACTIVITY:  Pencil balance — balance a pencil on one finger for 5 seconds.
+2
+CLUE
+CLUE 2  ›  Lawn → Rabbit Cage
+Life in a box — small ears, small eyes, small heartbeat. In the open lawn, something lives and is cared for, contained behind wire in the grass. Find the dwelling of the small creature.
+⬥ ACTIVITY:  Human knot — tie a human knot and untangle without releasing hands.
+3
+CLUE
+CLUE 3  ›  Back Gate → Security Cabin
+Where the campus ends and the outside begins at the rear, a cabin stands — not the front face, not the main gate. Find the shelter at the back boundary where a guardian sits.
+⬥ ACTIVITY:  Statue freeze — all 4 freeze mid-movement on command for 12 seconds.
+4
+CLUE
+CLUE 4  ›  Lawn → (navigate to Global Reach Station)
+You are being watched. The agents know where you have been. But the signal you seek now is not a clue hidden under a step or behind a wall — it is in the open, on the grass, where anyone can find it if they know to look. Go to the lawn.
+⬥ ACTIVITY:  Guess the object — blindfolded member identifies object by touch in 10 seconds to earn directions to the Global Reach Station.
+5
+CLUE
+CLUE 5  ›  Global Reach Station → Lawn
+Every signal carries noise. Every message has a sender. You have been chasing code across this campus — but code does not exist without communication. Somewhere on the open ground, a broadcast waits. A station has been set up in the field. Find the signal. Find the booth. Find Global Reach.
+⬥ ACTIVITY:  GLOBAL REACH BRANDED ACTIVITY — 'Break Through the Noise': Complete the Global Reach challenge (decoding a brand message, business pitch, or communication task as designed by Global Reach). On successful completion, the Global Reach representative awards Clue Card 5.
+6
+CLUE
+CLUE 6  ›  Girls Entrance → Stairs
+Not the ramp, not the lift — at the entrance built for them, find the structure of rising stone. Steps that have carried a thousand footfalls at the girls' gate.
+⬥ ACTIVITY:  Word chain — 5 words related to freedom, each starting with the last letter of the previous.
+⬛
+FINAL
+FINAL CLUE  →  CLUE 7  ›  BOYS ENTRANCE
+One final crossing. The entrance on the other side — where the other half of campus first sets foot. A staircase rises there, worn and familiar. Your checkpoint waits at its base.
+⬥ ACTIVITY:  FINAL CHECKPOINT — Master Code assembly and vault passkey.
+TEAM 8  —  TEAM APOC
+Quadrant: CENTRAL  ·  7 Clues  ·  Start: AX 316
+PATH SUMMARY — TEAM APOC
+STEP
+LOCATION
+ACTIVITY
+START
+AX 316
+Red Pill Kit distribution
+Clue 1
+Lawn → Road Roller
+Coin spin — spin a coin and keep it going for 5 seconds…
+Clue 2
+Back Gate → Fish Tank
+Silent coordination — count to 10 as a group, no person…
+Clue 3
+Polytech Foyer → Stationary
+Rapid fire riddles — volunteer asks 3 riddles, team mus…
+Clue 4
+Lawn → (navigate to Global Reach Station)
+Rhythm tap — replicate the volunteer's tapped rhythm to…
+Clue 5
+Global Reach Station → Lawn
+GLOBAL REACH BRANDED ACTIVITY — 'Break Through the Nois…
+Clue 6
+Girls Entrance → Seat
+Backwards alphabet — one team member recites the alphab…
+FINAL
+Boys Entrance → Seats/Chair
+FINAL CHECKPOINT — Master Code assembly and vault passk…
+── CLUE CARDS ──────────────────────────────────────────
+1
+CLUE
+CLUE 1  ›  Lawn → Road Roller
+On the open grass, something massive and cylindrical once pressed the earth flat. It does not move today — it rests like a giant's toy abandoned mid-game. Find the relic of construction.
+⬥ ACTIVITY:  Coin spin — spin a coin and keep it going for 5 seconds without touching it again.
+2
+CLUE
+CLUE 2  ›  Back Gate → Fish Tank
+At the campus boundary you rarely visit — the rear exit — something aquatic lives in glass. Not a natural body of water, but a contained world behind the gate. Find it.
+⬥ ACTIVITY:  Silent coordination — count to 10 as a group, no person says two consecutive numbers, no overlap.
+3
+CLUE
+CLUE 3  ›  Polytech Foyer → Stationary
+Where tools are sold and supplies are stacked — not a shop, not a class — a place in the foyer of technology where the small necessities of study are kept. Find the stationery in the foyer.
+⬥ ACTIVITY:  Rapid fire riddles — volunteer asks 3 riddles, team must answer 2 of 3 correctly.
+4
+CLUE
+CLUE 4  ›  Lawn → (navigate to Global Reach Station)
+Beyond the canteen, beyond the buildings — where the ground opens and the air moves freely — something has been placed in the field. Not a machine, not a monument. A booth. A broadcast. A challenge. The lawn holds your next instruction.
+⬥ ACTIVITY:  Rhythm tap — replicate the volunteer's tapped rhythm to earn directions to the Global Reach Station on the Lawn.
+5
+CLUE
+CLUE 5  ›  Global Reach Station → Lawn
+Every signal carries noise. Every message has a sender. You have been chasing code across this campus — but code does not exist without communication. Somewhere on the open ground, a broadcast waits. A station has been set up in the field. Find the signal. Find the booth. Find Global Reach.
+⬥ ACTIVITY:  GLOBAL REACH BRANDED ACTIVITY — 'Break Through the Noise': Complete the Global Reach challenge (decoding a brand message, business pitch, or communication task as designed by Global Reach). On successful completion, the Global Reach representative awards Clue Card 5.
+6
+CLUE
+CLUE 6  ›  Girls Entrance → Seat
+At the feminine gate, find the elevated resting place — a seat that sits above ground level, built into the architecture of the entrance. The place where one pauses before entering.
+⬥ ACTIVITY:  Backwards alphabet — one team member recites the alphabet backwards without error.
+⬛
+FINAL
+FINAL CLUE  →  CLUE 7  ›  BOYS ENTRANCE
+Now cross to the entrance that completes the pair. The boys' gate holds your final answer — not in the lift, not on the ramp. Find where the seats gather at the final threshold. Your checkpoint is among them.
+⬥ ACTIVITY:  FINAL CHECKPOINT — Master Code assembly and vault passkey.
+TEAM 9  —  TEAM DOZER
+Quadrant: FOYER  ·  7 Clues  ·  Start: AX 316
+PATH SUMMARY — TEAM DOZER
+STEP
+LOCATION
+ACTIVITY
+START
+AX 316
+Red Pill Kit distribution
+Clue 1
+Polytech Foyer → Lift Area
+Bottle flip — land it upright in 3 attempts.
+Clue 2
+Canteen Alley → Generator
+Paper airplane — fly it 2 metres minimum.
+Clue 3
+Balbhavan → Trees
+Leaf catch — catch a falling leaf before it hits the gr…
+Clue 4
+Lawn → (navigate to Global Reach Station)
+Dumb charades — one member acts out a Matrix scene to e…
+Clue 5
+Global Reach Station → Lawn
+GLOBAL REACH BRANDED ACTIVITY — 'Break Through the Nois…
+Clue 6
+Girls Entrance → Table
+Coin toss — win 2 of 3 against the volunteer.
+FINAL
+Boys Entrance → Staircase
+FINAL CHECKPOINT — Master Code assembly and vault passk…
+── CLUE CARDS ──────────────────────────────────────────
+1
+CLUE
+CLUE 1  ›  Polytech Foyer → Lift Area
+Progress lives in this foyer — technology on every floor. But at the base, near the vertical transporter, a zone of waiting and transition hums with quiet purpose. Find the lift area in the hall of applied science.
+⬥ ACTIVITY:  Bottle flip — land it upright in 3 attempts.
+2
+CLUE
+CLUE 2  ›  Canteen Alley → Generator
+In the alley of food and noise, something powers what would otherwise go dark. A mechanical breath-holder, metal-bodied, fuels the electricity of hunger. Find the hum.
+⬥ ACTIVITY:  Paper airplane — fly it 2 metres minimum.
+3
+CLUE
+CLUE 3  ›  Balbhavan → Trees
+A campus is more than buildings — trees stand at its edges too. Somewhere between childhood memory and academic present, a garden for children holds trees that have grown old watching over play. Find the trees of Balbhavan.
+⬥ ACTIVITY:  Leaf catch — catch a falling leaf before it hits the ground.
+4
+CLUE
+CLUE 4  ›  Lawn → (navigate to Global Reach Station)
+Leave the foyer behind. Exit the building and find the space between structures where the grass grows unchecked. The campus lawn — an open clearing between the concrete world — holds a station that appeared this morning. Find it.
+⬥ ACTIVITY:  Dumb charades — one member acts out a Matrix scene to earn directions to the Global Reach Station.
+5
+CLUE
+CLUE 5  ›  Global Reach Station → Lawn
+Every signal carries noise. Every message has a sender. You have been chasing code across this campus — but code does not exist without communication. Somewhere on the open ground, a broadcast waits. A station has been set up in the field. Find the signal. Find the booth. Find Global Reach.
+⬥ ACTIVITY:  GLOBAL REACH BRANDED ACTIVITY — 'Break Through the Noise': Complete the Global Reach challenge (decoding a brand message, business pitch, or communication task as designed by Global Reach). On successful completion, the Global Reach representative awards Clue Card 5.
+6
+CLUE
+CLUE 6  ›  Girls Entrance → Table
+At the entrance fashioned for them, there is neither ramp nor stairs at this spot — just a flat surface that holds what is placed upon it. A table, patient and still, at the feminine gate.
+⬥ ACTIVITY:  Coin toss — win 2 of 3 against the volunteer.
+⬛
+FINAL
+FINAL CLUE  →  CLUE 7  ›  BOYS ENTRANCE
+Mirror the entrance you just left — cross to where the other half of campus begins. Not the chair, not the ramp. Find where the staircase rises at the boys' gate and let it carry you to your final destination.
+⬥ ACTIVITY:  FINAL CHECKPOINT — Master Code assembly and vault passkey.
+TEAM 10  —  TEAM TANK
+Quadrant: FOYER  ·  7 Clues  ·  Start: AX 316
+PATH SUMMARY — TEAM TANK
+STEP
+LOCATION
+ACTIVITY
+START
+AX 316
+Red Pill Kit distribution
+Clue 1
+Polytech Foyer → Golf Cart
+Rock paper scissors — majority vote vs volunteer, best …
+Clue 2
+Back Gate → Fish Tank
+Human knot — untangle without letting go.
+Clue 3
+Parking Lot → Trees
+Human sculpture — form a single still shape as a team i…
+Clue 4
+Lawn → (navigate to Global Reach Station)
+Tower build — tallest tower from 5 cups in 30 seconds t…
+Clue 5
+Global Reach Station → Lawn
+GLOBAL REACH BRANDED ACTIVITY — 'Break Through the Nois…
+Clue 6
+Girls Entrance → Ramp
+Mirror walk — one member leads, one mirrors, 15 seconds…
+FINAL
+Boys Entrance → Ramp
+FINAL CHECKPOINT — Master Code assembly and vault passk…
+── CLUE CARDS ──────────────────────────────────────────
+1
+CLUE
+CLUE 1  ›  Polytech Foyer → Golf Cart
+In the foyer of technical progress, a small wheeled carrier rests on the ground floor. It moves when called upon, patient when not. Find the vehicle that goes nowhere fast in a foyer of learning.
+⬥ ACTIVITY:  Rock paper scissors — majority vote vs volunteer, best of 5.
+2
+CLUE
+CLUE 2  ›  Back Gate → Fish Tank
+Walk toward the back of campus — past the lawns and the buildings — until you reach a boundary. A tank of water holds a world in miniature. Find what lives behind glass at the rear gate.
+⬥ ACTIVITY:  Human knot — untangle without letting go.
+3
+CLUE
+CLUE 3  ›  Parking Lot → Trees
+In the lot where vehicles rest in rows, something organic grows despite the concrete. Trees stand between machines, indifferent to the metal around them. Find the living among the parked.
+⬥ ACTIVITY:  Human sculpture — form a single still shape as a team in 20 seconds.
+4
+CLUE
+CLUE 4  ›  Lawn → (navigate to Global Reach Station)
+The simulation compresses. The buildings crowd. But somewhere between them lies open ground — unroofed, unenclosed, breathing. Go to the lawn of this campus. A station has been established there. They are waiting for you.
+⬥ ACTIVITY:  Tower build — tallest tower from 5 cups in 30 seconds to earn directions to the Global Reach Station.
+5
+CLUE
+CLUE 5  ›  Global Reach Station → Lawn
+Every signal carries noise. Every message has a sender. You have been chasing code across this campus — but code does not exist without communication. Somewhere on the open ground, a broadcast waits. A station has been set up in the field. Find the signal. Find the booth. Find Global Reach.
+⬥ ACTIVITY:  GLOBAL REACH BRANDED ACTIVITY — 'Break Through the Noise': Complete the Global Reach challenge (decoding a brand message, business pitch, or communication task as designed by Global Reach). On successful completion, the Global Reach representative awards Clue Card 5.
+6
+CLUE
+CLUE 6  ›  Girls Entrance → Ramp
+At the entrance reserved for half the campus, a gentle incline greets those who cannot take the stairs. The ramp at the girls' gate — a path of welcome and access. Find it.
+⬥ ACTIVITY:  Mirror walk — one member leads, one mirrors, 15 seconds.
+⬛
+FINAL
+FINAL CLUE  →  CLUE 7  ›  BOYS ENTRANCE
+The final gate awaits. Boys enter here — and at this entrance, where the ramp greets newcomers gently, your checkpoint stands ready. Climb no stairs. Take no lift. Find the slope.
+⬥ ACTIVITY:  FINAL CHECKPOINT — Master Code assembly and vault passkey.
+TEAM 11  —  TEAM SERAPH
+Quadrant: FOYER  ·  7 Clues  ·  Start: AX 316
+PATH SUMMARY — TEAM SERAPH
+STEP
+LOCATION
+ACTIVITY
+START
+AX 316
+Red Pill Kit distribution
+Clue 1
+Security Cabin → Front Gate Cabin
+Pencil balance — 5 seconds on one finger.
+Clue 2
+Polytech Foyer → Stationary
+Tongue twister relay — each member completes one in seq…
+Clue 3
+Parking Lot → Trees
+Statue freeze — all 4 freeze for 12 seconds on command.
+Clue 4
+Lawn → (navigate to Global Reach Station)
+Word chain — 5 words connected to 'signal', each starti…
+Clue 5
+Global Reach Station → Lawn
+GLOBAL REACH BRANDED ACTIVITY — 'Break Through the Nois…
+Clue 6
+Girls Entrance → Seat
+Backwards count — 20 to 1, each member one number at a …
+FINAL
+Boys Entrance → Lift Area
+FINAL CHECKPOINT — Master Code assembly and vault passk…
+── CLUE CARDS ──────────────────────────────────────────
+1
+CLUE
+CLUE 1  ›  Security Cabin → Front Gate Cabin
+At the frontier between campus and the outside world — not the back, not the rear — a small cabin at the very front stands watch. The gatekeeper sits here and sees all who arrive. Find the front face guardian.
+⬥ ACTIVITY:  Pencil balance — 5 seconds on one finger.
+2
+CLUE
+CLUE 2  ›  Polytech Foyer → Stationary
+In the foyer of engineering and applied knowledge, supplies for the mind are arranged in neat rows — not for eating, not for building, but for writing, drawing, and noting. Find the stationery.
+⬥ ACTIVITY:  Tongue twister relay — each member completes one in sequence.
+3
+CLUE
+CLUE 3  ›  Parking Lot → Trees
+Where the parking gives way to natural growth, trees hold their ground among the machines. Not inside any building — outside, among the parked rows. Find what grows in the parking lot.
+⬥ ACTIVITY:  Statue freeze — all 4 freeze for 12 seconds on command.
+4
+CLUE
+CLUE 4  ›  Lawn → (navigate to Global Reach Station)
+All signals eventually need open air. The campus has such a place — a green expanse that most cross without pausing. Today you must pause. A booth stands in the field, erected by those who specialise in reaching further. Find it on the lawn.
+⬥ ACTIVITY:  Word chain — 5 words connected to 'signal', each starting with last letter of previous, to earn directions to the Global Reach Station.
+5
+CLUE
+CLUE 5  ›  Global Reach Station → Lawn
+Every signal carries noise. Every message has a sender. You have been chasing code across this campus — but code does not exist without communication. Somewhere on the open ground, a broadcast waits. A station has been set up in the field. Find the signal. Find the booth. Find Global Reach.
+⬥ ACTIVITY:  GLOBAL REACH BRANDED ACTIVITY — 'Break Through the Noise': Complete the Global Reach challenge (decoding a brand message, business pitch, or communication task as designed by Global Reach). On successful completion, the Global Reach representative awards Clue Card 5.
+6
+CLUE
+CLUE 6  ›  Girls Entrance → Seat
+Where the feminine entrance presents its options, choose neither the ramp nor the stairs — find the place a person sits. A seat built into the entrance, waiting for the patient.
+⬥ ACTIVITY:  Backwards count — 20 to 1, each member one number at a time, no hesitation.
+⬛
+FINAL
+FINAL CLUE  →  CLUE 7  ›  BOYS ENTRANCE
+The final act plays out at the masculine counterpart to where you have been. At the boys' entrance, find not the ramp, not the steps — but the area where the vertical machine waits. Your checkpoint stands in the lift zone.
+⬥ ACTIVITY:  FINAL CHECKPOINT — Master Code assembly and vault passkey.
+TEAM 12  —  TEAM MEROVINGIAN
+Quadrant: FOYER  ·  7 Clues  ·  Start: AX 316
+PATH SUMMARY — TEAM MEROVINGIAN
+STEP
+LOCATION
+ACTIVITY
+START
+AX 316
+Red Pill Kit distribution
+Clue 1
+Polytech Foyer → Lift Area
+Balance beam — heel-to-toe across 5 metres.
+Clue 2
+Canteen Alley → Lamp Post
+Paper toss — land ball in bin from 3 metres, 3 attempts…
+Clue 3
+Parking Lot → Red Pipe
+Coin spin — keep it spinning for 5 seconds.
+Clue 4
+Lawn → (navigate to Global Reach Station)
+Rapid fire riddles — 2 of 3 correct answers to earn dir…
+Clue 5
+Global Reach Station → Lawn
+GLOBAL REACH BRANDED ACTIVITY — 'Break Through the Nois…
+Clue 6
+Girls Entrance → Lift Area
+Guess the object — blindfolded, by touch, 10 seconds.
+FINAL
+Boys Entrance → Staircase
+FINAL CHECKPOINT — Master Code assembly and vault passk…
+── CLUE CARDS ──────────────────────────────────────────
+1
+CLUE
+CLUE 1  ›  Polytech Foyer → Lift Area
+In the foyer of technological promise, find not the cart, not the stationery, not the lift — but the place between these things where the machine of vertical travel waits. The lift area in the polytech foyer holds your first answer.
+⬥ ACTIVITY:  Balance beam — heel-to-toe across 5 metres.
+2
+CLUE
+CLUE 2  ›  Canteen Alley → Lamp Post
+In the alley where the campus feeds itself, a tall structure stands sentinel — not metal, not human, but a post planted in the ground that holds a globe of light above the world. Find the lamp.
+⬥ ACTIVITY:  Paper toss — land ball in bin from 3 metres, 3 attempts.
+3
+CLUE
+CLUE 3  ›  Parking Lot → Red Pipe
+Something red and cylindrical runs along the ground in the lot of parked machines — a pipe carrying pressure or perhaps just standing guard. Find the red conduit among the vehicles.
+⬥ ACTIVITY:  Coin spin — keep it spinning for 5 seconds.
+4
+CLUE
+CLUE 4  ›  Lawn → (navigate to Global Reach Station)
+Power travels in many forms. Today it travels through open air on the campus lawn. Leave the buildings — their ducts, their lifts, their foyers — and step outside onto the grass. A station awaits on the open ground. Find it.
+⬥ ACTIVITY:  Rapid fire riddles — 2 of 3 correct answers to earn directions to the Global Reach Station on the Lawn.
+5
+CLUE
+CLUE 5  ›  Global Reach Station → Lawn
+Every signal carries noise. Every message has a sender. You have been chasing code across this campus — but code does not exist without communication. Somewhere on the open ground, a broadcast waits. A station has been set up in the field. Find the signal. Find the booth. Find Global Reach.
+⬥ ACTIVITY:  GLOBAL REACH BRANDED ACTIVITY — 'Break Through the Noise': Complete the Global Reach challenge (decoding a brand message, business pitch, or communication task as designed by Global Reach). On successful completion, the Global Reach representative awards Clue Card 5.
+6
+CLUE
+CLUE 6  ›  Girls Entrance → Lift Area
+At the entrance for the feminine half of this campus, find the elevated crossing — not stairs to climb, but a lift zone for those who wish to ascend without effort. Find the lift area at the girls' entrance.
+⬥ ACTIVITY:  Guess the object — blindfolded, by touch, 10 seconds.
+⬛
+FINAL
+FINAL CLUE  →  CLUE 7  ›  BOYS ENTRANCE
+Cross to the final entrance. At the boys' gate, find the structure of stone — the stairs that have borne the weight of arrivals and departures for years. Your final checkpoint waits at the base of the climb.
+⬥ ACTIVITY:  FINAL CHECKPOINT — Master Code assembly and vault passkey.
+TEAM 13  —  TEAM GHOST
+Quadrant: ENTRY  ·  7 Clues  ·  Start: AX 316
+PATH SUMMARY — TEAM GHOST
+STEP
+LOCATION
+ACTIVITY
+START
+AX 316
+Red Pill Kit distribution
+Clue 1
+Girls Entrance → Ramp
+Bottle flip — land it in 3 attempts.
+Clue 2
+Lawn → Volleyball Net
+Rock paper scissors — team majority vs volunteer, best …
+Clue 3
+Back Gate → Chairs
+Human knot — untangle without releasing hands.
+Clue 4
+Lawn → (navigate to Global Reach Station)
+Category sprint — 5 Matrix villains in 10 seconds to ea…
+Clue 5
+Global Reach Station → Lawn
+GLOBAL REACH BRANDED ACTIVITY — 'Break Through the Nois…
+Clue 6
+Fountain → Flag Pole
+Tower build — 5 cups, tallest tower in 30 seconds.
+FINAL
+Boys Entrance → Seats/Chair
+FINAL CHECKPOINT — Master Code assembly and vault passk…
+── CLUE CARDS ──────────────────────────────────────────
+1
+CLUE
+CLUE 1  ›  Girls Entrance → Ramp
+At the entrance meant for one half, find the gently inclining path — not made of steps, but of smooth surface rising to meet the door. The ramp at the girls' gate is where your trail begins.
+⬥ ACTIVITY:  Bottle flip — land it in 3 attempts.
+2
+CLUE
+CLUE 2  ›  Lawn → Volleyball Net
+Go to where the net divides air from air in the open green. Not a tennis court, not a football pitch — but a net in the grass designed for a ball that must not fall. Find the volleyball net in the lawn.
+⬥ ACTIVITY:  Rock paper scissors — team majority vs volunteer, best of 5.
+3
+CLUE
+CLUE 3  ›  Back Gate → Chairs
+The campus has a rear boundary. At this boundary, chairs have been placed — not for students, not for faculty, but for those whose job is to watch and wait. Find the chairs at the back gate.
+⬥ ACTIVITY:  Human knot — untangle without releasing hands.
+4
+CLUE
+CLUE 4  ›  Lawn → (navigate to Global Reach Station)
+Between the entrance you came from and the buildings ahead lies a stretch of open ground. The lawn — green, wide, unhidden — holds something today that was not there before. A broadcaster has come to campus. Find them.
+⬥ ACTIVITY:  Category sprint — 5 Matrix villains in 10 seconds to earn directions to the Global Reach Station.
+5
+CLUE
+CLUE 5  ›  Global Reach Station → Lawn
+Every signal carries noise. Every message has a sender. You have been chasing code across this campus — but code does not exist without communication. Somewhere on the open ground, a broadcast waits. A station has been set up in the field. Find the signal. Find the booth. Find Global Reach.
+⬥ ACTIVITY:  GLOBAL REACH BRANDED ACTIVITY — 'Break Through the Noise': Complete the Global Reach challenge (decoding a brand message, business pitch, or communication task as designed by Global Reach). On successful completion, the Global Reach representative awards Clue Card 5.
+6
+CLUE
+CLUE 6  ›  Fountain → Flag Pole
+Near the fountain, not among the seats, not at the stairs — but at the vertical marker of belonging. Find the pole from which a flag flies near the water.
+⬥ ACTIVITY:  Tower build — 5 cups, tallest tower in 30 seconds.
+⬛
+FINAL
+FINAL CLUE  →  CLUE 7  ›  BOYS ENTRANCE
+One entrance over. The masculine gate — where arrivals begin for the other half. Find not the ramp, not the lift zone — but the gathered seats where those who wait, wait. Your checkpoint is among them.
+⬥ ACTIVITY:  FINAL CHECKPOINT — Master Code assembly and vault passkey.
+TEAM 14  —  TEAM LOCK
+Quadrant: ENTRY  ·  7 Clues  ·  Start: AX 316
+PATH SUMMARY — TEAM LOCK
+STEP
+LOCATION
+ACTIVITY
+START
+AX 316
+Red Pill Kit distribution
+Clue 1
+Girls Entrance → Table
+Paper airplane — fly 2 metres minimum.
+Clue 2
+Canteen Alley → Pipe
+Coin toss — call correctly 2 of 3 against the volunteer…
+Clue 3
+Workshop → Shed
+Pencil balance — 5 seconds on one finger.
+Clue 4
+Lawn → (navigate to Global Reach Station)
+Statue freeze — all 4 freeze in place for 15 seconds to…
+Clue 5
+Global Reach Station → Lawn
+GLOBAL REACH BRANDED ACTIVITY — 'Break Through the Nois…
+Clue 6
+Boys Entrance → Ramp
+Word chain — 5 words related to 'code', each beginning …
+FINAL
+Boys Entrance → Staircase
+FINAL CHECKPOINT — Master Code assembly and vault passk…
+── CLUE CARDS ──────────────────────────────────────────
+1
+CLUE
+CLUE 1  ›  Girls Entrance → Table
+Where the feminine entrance offers a choice of paths, take none — instead, find the surface that was placed there for things to rest upon. A table at the girls' gate awaits your first discovery.
+⬥ ACTIVITY:  Paper airplane — fly 2 metres minimum.
+2
+CLUE
+CLUE 2  ›  Canteen Alley → Pipe
+In the alley of food and human noise, find the underground or ground-level carrier — a pipe that moves what must be moved, silently and without ceremony. Find the pipe.
+⬥ ACTIVITY:  Coin toss — call correctly 2 of 3 against the volunteer.
+3
+CLUE
+CLUE 3  ›  Workshop → Shed
+The workshop holds raw material. Not in the main body — but in its shadow, in the smaller structure that stores overflow and excess. Go to the shed behind the workshop.
+⬥ ACTIVITY:  Pencil balance — 5 seconds on one finger.
+4
+CLUE
+CLUE 4  ›  Lawn → (navigate to Global Reach Station)
+From the alleys and the gates and the pipes — all roads lead eventually to open ground. The lawn of this campus is the clearing in the simulation. Step outside. Step onto the grass. A station stands there, and it has something for you.
+⬥ ACTIVITY:  Statue freeze — all 4 freeze in place for 15 seconds to earn directions to the Global Reach Station.
+5
+CLUE
+CLUE 5  ›  Global Reach Station → Lawn
+Every signal carries noise. Every message has a sender. You have been chasing code across this campus — but code does not exist without communication. Somewhere on the open ground, a broadcast waits. A station has been set up in the field. Find the signal. Find the booth. Find Global Reach.
+⬥ ACTIVITY:  GLOBAL REACH BRANDED ACTIVITY — 'Break Through the Noise': Complete the Global Reach challenge (decoding a brand message, business pitch, or communication task as designed by Global Reach). On successful completion, the Global Reach representative awards Clue Card 5.
+6
+CLUE
+CLUE 6  ›  Boys Entrance → Ramp
+Back toward the entrance. The feminine gate is behind you now. Cross to its counterpart — where boys arrive — and find the gentle slope that welcomes them without stairs.
+⬥ ACTIVITY:  Word chain — 5 words related to 'code', each beginning with the last letter of the previous.
+⬛
+FINAL
+FINAL CLUE  →  CLUE 7  ›  BOYS ENTRANCE
+You stand at the ramp. The staircase calls — a few steps away, the stone ascent at the boys' entrance holds the final answer. Your checkpoint lies at the base of the climb. Go.
+⬥ ACTIVITY:  FINAL CHECKPOINT — Master Code assembly and vault passkey.
+TEAM 15  —  TEAM LINK
+Quadrant: ENTRY  ·  7 Clues  ·  Start: AX 316
+PATH SUMMARY — TEAM LINK
+STEP
+LOCATION
+ACTIVITY
+START
+AX 316
+Red Pill Kit distribution
+Clue 1
+Girls Entrance → Stairs
+Human sculpture — form a still shape as a team in 20 se…
+Clue 2
+Canteen Alley → Lamp Post
+Tongue twister relay — one per member in sequence.
+Clue 3
+Back Gate → Security Cabin
+Rapid fire riddles — 2 of 3 correct.
+Clue 4
+Lawn → (navigate to Global Reach Station)
+Backwards count — 20 to 1, one number per person, no he…
+Clue 5
+Global Reach Station → Lawn
+GLOBAL REACH BRANDED ACTIVITY — 'Break Through the Nois…
+Clue 6
+Fountain → Stairs
+Dumb charades — act out 'escape room' as a concept, 30 …
+FINAL
+Boys Entrance → Lift Area
+FINAL CHECKPOINT — Master Code assembly and vault passk…
+── CLUE CARDS ──────────────────────────────────────────
+1
+CLUE
+CLUE 1  ›  Girls Entrance → Stairs
+At the entrance made for them, find where ascent happens on foot — not the ramp, not the lift zone, but the stone structure of steps rising from the ground. The stairs at the girls' entrance begin your trail.
+⬥ ACTIVITY:  Human sculpture — form a still shape as a team in 20 seconds.
+2
+CLUE
+CLUE 2  ›  Canteen Alley → Lamp Post
+A sentinel of light towers over the alley of food. Not a building, not a sign — a post with a lantern at its crown, standing in the canteen passage. Find the lamp post.
+⬥ ACTIVITY:  Tongue twister relay — one per member in sequence.
+3
+CLUE
+CLUE 3  ›  Back Gate → Security Cabin
+Behind the campus where few tread, a cabin keeps watch. Not the main entrance guardian — the one at the back. Find the security shelter at the rear boundary.
+⬥ ACTIVITY:  Rapid fire riddles — 2 of 3 correct.
+4
+CLUE
+CLUE 4  ›  Lawn → (navigate to Global Reach Station)
+You have traced the signal from post to cabin to pipe. Now the signal itself has taken physical form — a booth erected in the open, on the campus green, in the space where the sky meets the ground. Go to the lawn. Find the booth.
+⬥ ACTIVITY:  Backwards count — 20 to 1, one number per person, no hesitation, to earn directions to the Global Reach Station.
+5
+CLUE
+CLUE 5  ›  Global Reach Station → Lawn
+Every signal carries noise. Every message has a sender. You have been chasing code across this campus — but code does not exist without communication. Somewhere on the open ground, a broadcast waits. A station has been set up in the field. Find the signal. Find the booth. Find Global Reach.
+⬥ ACTIVITY:  GLOBAL REACH BRANDED ACTIVITY — 'Break Through the Noise': Complete the Global Reach challenge (decoding a brand message, business pitch, or communication task as designed by Global Reach). On successful completion, the Global Reach representative awards Clue Card 5.
+6
+CLUE
+CLUE 6  ›  Fountain → Stairs
+Near still water and the national emblem of pride, find the stone steps that carry feet away from the splash. Near the fountain, a descent of stone leads away from the centre.
+⬥ ACTIVITY:  Dumb charades — act out 'escape room' as a concept, 30 seconds.
+⬛
+FINAL
+FINAL CLUE  →  CLUE 7  ›  BOYS ENTRANCE
+You have moved from entrance to alley, from cabin to field, from fountain to threshold. One final door. The boys' entrance — and within it, the vertical zone reserved for those who ride, not climb. Find the lift area. Your checkpoint waits.
+⬥ ACTIVITY:  FINAL CHECKPOINT — Master Code assembly and vault passkey.
+TEAM 16  —  TEAM PERSEPHONE
+Quadrant: ENTRY  ·  7 Clues  ·  Start: AX 316
+PATH SUMMARY — TEAM PERSEPHONE
+STEP
+LOCATION
+ACTIVITY
+START
+AX 316
+Red Pill Kit distribution
+Clue 1
+Girls Entrance → Lift Area
+Coin spin — keep it going for 5 seconds.
+Clue 2
+Canteen Alley → Wall named SWAPNIL
+Paper toss — land ball in bin from 3 metres, 3 attempts…
+Clue 3
+Formix Entrance → Ramp Entrance
+Balance beam — heel to toe, 5 metres.
+Clue 4
+Lawn → (navigate to Global Reach Station)
+Mirror challenge — one member mirrors volunteer movemen…
+Clue 5
+Global Reach Station → Lawn
+GLOBAL REACH BRANDED ACTIVITY — 'Break Through the Nois…
+Clue 6
+Fountain → Stairs
+Category sprint — 5 words that mean 'hidden', 10 second…
+FINAL
+Boys Entrance → Staircase
+FINAL CHECKPOINT — Master Code assembly and vault passk…
+── CLUE CARDS ──────────────────────────────────────────
+1
+CLUE
+CLUE 1  ›  Girls Entrance → Lift Area
+Where the entrance is feminine and the options are many — ramp, stairs, seat, lift — choose the one that carries without effort. Find the lift zone at the girls' gate.
+⬥ ACTIVITY:  Coin spin — keep it going for 5 seconds.
+2
+CLUE
+CLUE 2  ›  Canteen Alley → Wall named SWAPNIL
+In the alley of hunger, something was written and never erased. Not a notice, not a sign — a name claimed on paint, permanent and proud. Find the wall that carries a person's name.
+⬥ ACTIVITY:  Paper toss — land ball in bin from 3 metres, 3 attempts.
+3
+CLUE
+CLUE 3  ›  Formix Entrance → Ramp Entrance
+Not the back gate, not the main gate — but the entrance bearing a commercial name. At its door, a slope of welcome eases the path from outside to in. Find the ramp at the named entrance.
+⬥ ACTIVITY:  Balance beam — heel to toe, 5 metres.
+4
+CLUE
+CLUE 4  ›  Lawn → (navigate to Global Reach Station)
+Not every answer is hidden. Some are placed in plain sight, in the open, on the grass, where anyone who looks will find them — but only those who were sent will know what to do. The lawn holds your next move. A station waits.
+⬥ ACTIVITY:  Mirror challenge — one member mirrors volunteer movements for 20 seconds to earn directions to the Global Reach Station.
+5
+CLUE
+CLUE 5  ›  Global Reach Station → Lawn
+Every signal carries noise. Every message has a sender. You have been chasing code across this campus — but code does not exist without communication. Somewhere on the open ground, a broadcast waits. A station has been set up in the field. Find the signal. Find the booth. Find Global Reach.
+⬥ ACTIVITY:  GLOBAL REACH BRANDED ACTIVITY — 'Break Through the Noise': Complete the Global Reach challenge (decoding a brand message, business pitch, or communication task as designed by Global Reach). On successful completion, the Global Reach representative awards Clue Card 5.
+6
+CLUE
+CLUE 6  ›  Fountain → Stairs
+Near the water at the campus centre, where the flag pole rises and the seats circle, find the stone descent. The stairs near the fountain lead away from the splash. Go there.
+⬥ ACTIVITY:  Category sprint — 5 words that mean 'hidden', 10 seconds.
+⬛
+FINAL
+FINAL CLUE  →  CLUE 7  ›  BOYS ENTRANCE
+The final act. The final entrance. Where boys first cross into campus, one structure stands above all others at that gate — not the lift, not the ramp, but the climbing stones of the staircase. Your checkpoint is at its foot.
+⬥ ACTIVITY:  FINAL CHECKPOINT — Master Code assembly and vault passkey.
+VOLUNTEER QUICK REFERENCE
+Which teams visit your station and in what clue order
+▸ Back Gate → Chairs
+TEAM
+CLUE #
+ACTIVITY
+TEAM ORACLE
+2
+Silent coordination — team must count to 10 aloud as a group with no single pers
+TEAM GHOST
+3
+Human knot — untangle without releasing hands.
+▸ Back Gate → Fish Tank
+TEAM
+CLUE #
+ACTIVITY
+TEAM APOC
+2
+Silent coordination — count to 10 as a group, no person says two consecutive num
+TEAM TANK
+2
+Human knot — untangle without letting go.
+▸ Back Gate → Security Cabin
+TEAM
+CLUE #
+ACTIVITY
+TEAM TRINITY
+2
+Rock paper scissors — team plays as one unit (majority vote per round) vs. the v
+TEAM SWITCH
+3
+Statue freeze — all 4 freeze mid-movement on command for 12 seconds.
+TEAM LINK
+3
+Rapid fire riddles — 2 of 3 correct.
+▸ Balbhavan → Trees
+TEAM
+CLUE #
+ACTIVITY
+TEAM MORPHEUS
+2
+Leaf catch — one member must catch a falling leaf (dropped by volunteer from hei
+TEAM DOZER
+3
+Leaf catch — catch a falling leaf before it hits the ground.
+▸ Boys Entrance → Lift Area
+TEAM
+CLUE #
+ACTIVITY
+TEAM ORACLE
+7
+FINAL CHECKPOINT — Master Code assembly and vault passkey.
+TEAM NIOBE
+7
+FINAL CHECKPOINT — Master Code assembly and vault passkey.
+TEAM SERAPH
+7
+FINAL CHECKPOINT — Master Code assembly and vault passkey.
+TEAM LINK
+7
+FINAL CHECKPOINT — Master Code assembly and vault passkey.
+▸ Boys Entrance → Ramp
+TEAM
+CLUE #
+ACTIVITY
+TEAM TRINITY
+7
+FINAL CHECKPOINT — Master Code assembly and vault passkey.
+TEAM AGENT SMITH
+7
+FINAL CHECKPOINT — Master Code assembly and vault passkey.
+TEAM TANK
+7
+FINAL CHECKPOINT — Master Code assembly and vault passkey.
+TEAM LOCK
+6
+Word chain — 5 words related to 'code', each beginning with the last letter of t
+▸ Boys Entrance → Seats/Chair
+TEAM
+CLUE #
+ACTIVITY
+TEAM MORPHEUS
+7
+FINAL CHECKPOINT — Master Code assembly and vault passkey.
+TEAM APOC
+7
+FINAL CHECKPOINT — Master Code assembly and vault passkey.
+TEAM GHOST
+7
+FINAL CHECKPOINT — Master Code assembly and vault passkey.
+▸ Boys Entrance → Staircase
+TEAM
+CLUE #
+ACTIVITY
+TEAM NEO
+7
+FINAL CHECKPOINT — Master Code assembly and vault passkey.
+TEAM SWITCH
+7
+FINAL CHECKPOINT — Master Code assembly and vault passkey.
+TEAM DOZER
+7
+FINAL CHECKPOINT — Master Code assembly and vault passkey.
+TEAM MEROVINGIAN
+7
+FINAL CHECKPOINT — Master Code assembly and vault passkey.
+TEAM LOCK
+7
+FINAL CHECKPOINT — Master Code assembly and vault passkey.
+TEAM PERSEPHONE
+7
+FINAL CHECKPOINT — Master Code assembly and vault passkey.
+▸ Canteen Alley → Generator
+TEAM
+CLUE #
+ACTIVITY
+TEAM TRINITY
+3
+Statue freeze — on the volunteer's signal, all 4 members must freeze mid-motion 
+TEAM MORPHEUS
+3
+Human knot — team ties themselves in a human knot and must untangle without rele
+TEAM DOZER
+2
+Paper airplane — fly it 2 metres minimum.
+▸ Canteen Alley → Lamp Post
+TEAM
+CLUE #
+ACTIVITY
+TEAM NEO
+2
+Paper toss — crumple a paper ball and land it in a bin from 3 metres to proceed.
+TEAM MEROVINGIAN
+2
+Paper toss — land ball in bin from 3 metres, 3 attempts.
+TEAM LINK
+2
+Tongue twister relay — one per member in sequence.
+▸ Canteen Alley → Pipe
+TEAM
+CLUE #
+ACTIVITY
+TEAM ORACLE
+3
+Stacking — stack 10 coins into a tower using only one hand.
+TEAM LOCK
+2
+Coin toss — call correctly 2 of 3 against the volunteer.
+▸ Canteen Alley → Wall named SWAPNIL
+TEAM
+CLUE #
+ACTIVITY
+TEAM NEO
+3
+One team member recites the Matrix opening quote: 'Wake up, Neo...' from memory 
+TEAM AGENT SMITH
+2
+Freeze frame — entire team freezes on command for 15 seconds in any position.
+TEAM SWITCH
+1
+Pencil balance — balance a pencil on one finger for 5 seconds.
+TEAM PERSEPHONE
+2
+Paper toss — land ball in bin from 3 metres, 3 attempts.
+▸ Formix Entrance → Ramp Entrance
+TEAM
+CLUE #
+ACTIVITY
+TEAM NIOBE
+3
+Tongue twister relay — each member completes a different tongue twister in seque
+TEAM PERSEPHONE
+3
+Balance beam — heel to toe, 5 metres.
+▸ Fountain → Flag Pole
+TEAM
+CLUE #
+ACTIVITY
+TEAM TRINITY
+6
+Word chain — team must chain 5 words related to The Matrix, each starting with t
+TEAM GHOST
+6
+Tower build — 5 cups, tallest tower in 30 seconds.
+▸ Fountain → Seats
+TEAM
+CLUE #
+ACTIVITY
+TEAM NEO
+6
+Tower build — using 5 plastic cups, build the tallest standing tower in 30 secon
+▸ Fountain → Stairs
+TEAM
+CLUE #
+ACTIVITY
+TEAM MORPHEUS
+6
+Dumb charades — one member acts out a Matrix scene, team guesses in 30 seconds.
+TEAM LINK
+6
+Dumb charades — act out 'escape room' as a concept, 30 seconds.
+TEAM PERSEPHONE
+6
+Category sprint — 5 words that mean 'hidden', 10 seconds.
+▸ Girls Entrance → Lift Area
+TEAM
+CLUE #
+ACTIVITY
+TEAM MEROVINGIAN
+6
+Guess the object — blindfolded, by touch, 10 seconds.
+TEAM PERSEPHONE
+1
+Coin spin — keep it going for 5 seconds.
+▸ Girls Entrance → Ramp
+TEAM
+CLUE #
+ACTIVITY
+TEAM NIOBE
+6
+Mirror walk — one member leads, another mirrors every movement for 15 seconds.
+TEAM TANK
+6
+Mirror walk — one member leads, one mirrors, 15 seconds.
+TEAM GHOST
+1
+Bottle flip — land it in 3 attempts.
+▸ Girls Entrance → Seat
+TEAM
+CLUE #
+ACTIVITY
+TEAM APOC
+6
+Backwards alphabet — one team member recites the alphabet backwards without erro
+TEAM SERAPH
+6
+Backwards count — 20 to 1, each member one number at a time, no hesitation.
+▸ Girls Entrance → Stairs
+TEAM
+CLUE #
+ACTIVITY
+TEAM AGENT SMITH
+6
+Rhythm tap — volunteer taps a rhythm, team replicates it together.
+TEAM SWITCH
+6
+Word chain — 5 words related to freedom, each starting with the last letter of t
+TEAM LINK
+1
+Human sculpture — form a still shape as a team in 20 seconds.
+▸ Girls Entrance → Table
+TEAM
+CLUE #
+ACTIVITY
+TEAM ORACLE
+6
+Jenga-style — carefully remove a block from a pre-built block tower without coll
+TEAM DOZER
+6
+Coin toss — win 2 of 3 against the volunteer.
+TEAM LOCK
+1
+Paper airplane — fly 2 metres minimum.
+▸ Global Reach Station → Lawn
+TEAM
+CLUE #
+ACTIVITY
+TEAM NEO
+5
+GLOBAL REACH BRANDED ACTIVITY — 'Break Through the Noise': Complete the Global R
+TEAM TRINITY
+5
+GLOBAL REACH BRANDED ACTIVITY — 'Break Through the Noise': Complete the Global R
+TEAM MORPHEUS
+5
+GLOBAL REACH BRANDED ACTIVITY — 'Break Through the Noise': Complete the Global R
+TEAM ORACLE
+5
+GLOBAL REACH BRANDED ACTIVITY — 'Break Through the Noise': Complete the Global R
+TEAM AGENT SMITH
+5
+GLOBAL REACH BRANDED ACTIVITY — 'Break Through the Noise': Complete the Global R
+TEAM NIOBE
+5
+GLOBAL REACH BRANDED ACTIVITY — 'Break Through the Noise': Complete the Global R
+TEAM SWITCH
+5
+GLOBAL REACH BRANDED ACTIVITY — 'Break Through the Noise': Complete the Global R
+TEAM APOC
+5
+GLOBAL REACH BRANDED ACTIVITY — 'Break Through the Noise': Complete the Global R
+TEAM DOZER
+5
+GLOBAL REACH BRANDED ACTIVITY — 'Break Through the Noise': Complete the Global R
+TEAM TANK
+5
+GLOBAL REACH BRANDED ACTIVITY — 'Break Through the Noise': Complete the Global R
+TEAM SERAPH
+5
+GLOBAL REACH BRANDED ACTIVITY — 'Break Through the Noise': Complete the Global R
+TEAM MEROVINGIAN
+5
+GLOBAL REACH BRANDED ACTIVITY — 'Break Through the Noise': Complete the Global R
+TEAM GHOST
+5
+GLOBAL REACH BRANDED ACTIVITY — 'Break Through the Noise': Complete the Global R
+TEAM LOCK
+5
+GLOBAL REACH BRANDED ACTIVITY — 'Break Through the Noise': Complete the Global R
+TEAM LINK
+5
+GLOBAL REACH BRANDED ACTIVITY — 'Break Through the Noise': Complete the Global R
+TEAM PERSEPHONE
+5
+GLOBAL REACH BRANDED ACTIVITY — 'Break Through the Noise': Complete the Global R
+▸ Lawn → (navigate to Global Reach Station)
+TEAM
+CLUE #
+ACTIVITY
+TEAM NEO
+4
+Coin toss — call correctly 2 of 3 against the volunteer to receive directions to
+TEAM TRINITY
+4
+Category sprint — name 5 Matrix characters in 10 seconds as a team to receive di
+TEAM MORPHEUS
+4
+Guess the object — blindfolded member identifies a common object by touch in 10 
+TEAM ORACLE
+4
+Balance beam — walk heel to toe along a straight line of 5 metres to earn direct
+TEAM AGENT SMITH
+4
+Human sculpture — the team has 20 seconds to form a single still sculpture using
+TEAM NIOBE
+4
+Category sprint — 5 things you'd find in The Matrix universe, in 10 seconds as a
+TEAM SWITCH
+4
+Guess the object — blindfolded member identifies object by touch in 10 seconds t
+TEAM APOC
+4
+Rhythm tap — replicate the volunteer's tapped rhythm to earn directions to the G
+TEAM DOZER
+4
+Dumb charades — one member acts out a Matrix scene to earn directions to the Glo
+TEAM TANK
+4
+Tower build — tallest tower from 5 cups in 30 seconds to earn directions to the 
+TEAM SERAPH
+4
+Word chain — 5 words connected to 'signal', each starting with last letter of pr
+TEAM MEROVINGIAN
+4
+Rapid fire riddles — 2 of 3 correct answers to earn directions to the Global Rea
+TEAM GHOST
+4
+Category sprint — 5 Matrix villains in 10 seconds to earn directions to the Glob
+TEAM LOCK
+4
+Statue freeze — all 4 freeze in place for 15 seconds to earn directions to the G
+TEAM LINK
+4
+Backwards count — 20 to 1, one number per person, no hesitation, to earn directi
+TEAM PERSEPHONE
+4
+Mirror challenge — one member mirrors volunteer movements for 20 seconds to earn
+▸ Lawn → Rabbit Cage
+TEAM
+CLUE #
+ACTIVITY
+TEAM NIOBE
+1
+Paper toss — land a crumpled paper ball in a bucket from 2 metres, first attempt
+TEAM SWITCH
+2
+Human knot — tie a human knot and untangle without releasing hands.
+▸ Lawn → Road Roller
+TEAM
+CLUE #
+ACTIVITY
+TEAM AGENT SMITH
+3
+Coin toss — call it correctly 2 out of 3 against the volunteer.
+TEAM APOC
+1
+Coin spin — spin a coin and keep it going for 5 seconds without touching it agai
+▸ Lawn → Volleyball Net
+TEAM
+CLUE #
+ACTIVITY
+TEAM AGENT SMITH
+1
+Bottle flip — must land bottle upright on a flat surface within 3 attempts.
+TEAM GHOST
+2
+Rock paper scissors — team majority vs volunteer, best of 5.
+▸ Parking Lot → Red Pipe
+TEAM
+CLUE #
+ACTIVITY
+TEAM MORPHEUS
+1
+Coin spin — spin a coin on a flat surface and keep it spinning for 5 seconds.
+TEAM MEROVINGIAN
+3
+Coin spin — keep it spinning for 5 seconds.
+▸ Parking Lot → Trash
+TEAM
+CLUE #
+ACTIVITY
+TEAM ORACLE
+1
+Paper airplane — fold and fly a paper airplane. Must travel at least 2 metres to
+▸ Parking Lot → Trees
+TEAM
+CLUE #
+ACTIVITY
+TEAM TANK
+3
+Human sculpture — form a single still shape as a team in 20 seconds.
+TEAM SERAPH
+3
+Statue freeze — all 4 freeze for 12 seconds on command.
+▸ Polytech Foyer → Golf Cart
+TEAM
+CLUE #
+ACTIVITY
+TEAM TANK
+1
+Rock paper scissors — majority vote vs volunteer, best of 5.
+▸ Polytech Foyer → Lift Area
+TEAM
+CLUE #
+ACTIVITY
+TEAM DOZER
+1
+Bottle flip — land it upright in 3 attempts.
+TEAM MEROVINGIAN
+1
+Balance beam — heel-to-toe across 5 metres.
+▸ Polytech Foyer → Stationary
+TEAM
+CLUE #
+ACTIVITY
+TEAM APOC
+3
+Rapid fire riddles — volunteer asks 3 riddles, team must answer 2 of 3 correctly
+TEAM SERAPH
+2
+Tongue twister relay — each member completes one in sequence.
+▸ Security Cabin → Front Gate Cabin
+TEAM
+CLUE #
+ACTIVITY
+TEAM NIOBE
+2
+Rock paper scissors — team majority vote vs volunteer. Best of 5 rounds.
+TEAM SERAPH
+1
+Pencil balance — 5 seconds on one finger.
+▸ Workshop → Shed
+TEAM
+CLUE #
+ACTIVITY
+TEAM NEO
+1
+Bottle flip — one member must land a bottle flip in 3 attempts to receive the ne
+TEAM TRINITY
+1
+Pencil balance — balance a pencil horizontally on one finger for 5 seconds.
+TEAM LOCK
+3
+Pencil balance — 5 seconds on one finger.
